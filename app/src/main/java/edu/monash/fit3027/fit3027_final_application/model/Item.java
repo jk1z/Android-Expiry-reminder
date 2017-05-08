@@ -1,4 +1,5 @@
 package edu.monash.fit3027.fit3027_final_application.model;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -18,6 +19,7 @@ public class Item implements Parcelable {
     private Calendar itemExpiryDate;
     private String itemColorTag;
     private int notifyDay;
+    private long itemBarcode;
 
     public static final String TABLE_NAME = "item";
     public static final String COLUMN_ID = "itemID";
@@ -26,22 +28,25 @@ public class Item implements Parcelable {
     public static final String COLUMN_DATE = "expiry_date";
     public static final String COLUMN_COLOR_TAG = "color_tag";
     public static final String COLUMN_NOTIFY_DAY = "notify_day";
+    public static final String COLUMN_BARCODE = "barcode";
 
-    public static final String CREATE_STATEMENT = "CREATE TABLE" + TABLE_NAME + "("
+    public static final String CREATE_STATEMENT = "CREATE TABLE " + TABLE_NAME + "("
             + COLUMN_ID + " TEXT PRIMARY KEY NOT NULL, "
             + COLUMN_NAME + " TEXT NOT NULL, "
-            + COLUMN_QUANTITY + "INTEGER NOT NULL, "
+            + COLUMN_QUANTITY + " INTEGER NOT NULL, "
             + COLUMN_DATE + " TEXT NOT NULL, "
             + COLUMN_COLOR_TAG + " TEXT NOT NULL, "
-            + COLUMN_NOTIFY_DAY + " INTEGER NOT NULL" + ")";
+            + COLUMN_NOTIFY_DAY + " INTEGER NOT NULL, "
+            + COLUMN_BARCODE + " INTEGER" + ")";
 
-    public Item(String itemID, String itemName, int itemQuantity, Calendar itemExpiryDate,String itemColorTag, int notifyDay){
+    public Item(String itemID, String itemName, int itemQuantity, Calendar itemExpiryDate, String itemColorTag, int notifyDay, long itemBarcode) {
         this.itemID = itemID;
         this.itemName = itemName;
         this.itemQuantity = itemQuantity;
         this.itemExpiryDate = itemExpiryDate;
         this.itemColorTag = itemColorTag;
         this.notifyDay = notifyDay;
+        this.itemBarcode = itemBarcode;
     }
 
     protected Item(Parcel in) {
@@ -51,6 +56,7 @@ public class Item implements Parcelable {
         itemExpiryDate = (Calendar) in.readSerializable();
         itemColorTag = in.readString();
         notifyDay = in.readInt();
+        itemBarcode = in.readLong();
     }
 
     @Override
@@ -61,6 +67,7 @@ public class Item implements Parcelable {
         dest.writeSerializable(itemExpiryDate);
         dest.writeString(itemColorTag);
         dest.writeInt(notifyDay);
+        dest.writeLong(itemBarcode);
     }
 
     @Override
@@ -128,7 +135,16 @@ public class Item implements Parcelable {
         this.notifyDay = notifyDay;
     }
 
-    public int daysLeft(){
+
+    public long getItemBarcode() {
+        return itemBarcode;
+    }
+
+    public void setItemBarcode(long itemBarcode) {
+        this.itemBarcode = itemBarcode;
+    }
+
+    public int daysLeft() {
         Calendar now = new GregorianCalendar();
         now.set(Calendar.MILLISECOND, 0);
         this.itemExpiryDate.set(Calendar.MILLISECOND, 0);
@@ -138,6 +154,6 @@ public class Item implements Parcelable {
         long endTime = endDate.getTime();
         long diffTime = endTime - startTime;
         long diffDays = diffTime / (1000 * 60 * 60 * 24);
-        return (int) Math.round(diffDays);
+        return Math.round(diffDays);
     }
 }

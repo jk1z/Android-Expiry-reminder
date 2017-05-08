@@ -11,37 +11,37 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="104dp">
+        android:layout_height="80dp">
 
         <ImageView
             android:id="@+id/colorTagImageView"
-            android:layout_width="110dp"
-            android:layout_height="match_parent"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:background="@android:color/holo_green_dark"
             android:visibility="visible"
-            app:srcCompat="@android:color/transparent" />
+            app:srcCompat="@android:color/transparent"
+            android:layout_alignParentBottom="true" />
 
         <TextView
             android:id="@+id/itemNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/itemQuantityTextView"
-            android:layout_alignTop="@+id/daysLeftTextView"
-            android:layout_marginStart="14dp"
+            android:layout_centerVertical="true"
             android:text="No Name"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/expiryDateTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/dayleftTextView"
-            android:layout_alignStart="@+id/itemNameTextView"
             android:text="6/5 Sat"
             android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:textSize="14sp"
+            android:layout_above="@+id/itemNameTextView"
+            android:layout_alignStart="@+id/itemNameTextView" />
 
         <TextView
             android:id="@+id/daysLeftTextView"
@@ -49,10 +49,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="14dp"
+            android:layout_marginEnd="22dp"
             android:text="2 Days"
             android:textColor="@android:color/black"
-            android:textSize="30sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/itemQuantityTextView"

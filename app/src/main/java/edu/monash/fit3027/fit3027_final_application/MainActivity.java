@@ -1,15 +1,19 @@
 package edu.monash.fit3027.fit3027_final_application;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -17,33 +21,46 @@ import java.util.UUID;
 
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private RecyclerView itemrecycleView;
-    private ArrayList<Item>demoItem;
+    private RecyclerView itemRecycleView;
+    private FloatingActionButton addItemFab;
+    private FloatingActionButton addThroughCameraFab;
+    private ArrayList<Item>itemArray;
+    private DatabaseHelper DBHelper;
+    private ItemAdapter adapter;
+    public final static int REQUEST_CONTENT_UPDATE = 1;
+    public final static int REQUEST_CREATE_WITH_BARCODE = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initialiseData();
+
+        DBHelper = new DatabaseHelper(getApplicationContext());
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        addItemFab = (FloatingActionButton) findViewById(R.id.addItemFab);
+        addThroughCameraFab = (FloatingActionButton) findViewById(R.id.addThroughCameraFab);
+        itemRecycleView = (RecyclerView)findViewById(R.id.itemRecyclerView);
+
+
+
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addItemFab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-        itemrecycleView = (RecyclerView)findViewById(R.id.itemRecyclerView);
-        itemrecycleView.setHasFixedSize(true);
+        itemRecycleView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
-        itemrecycleView.setLayoutManager(llm);
-        ItemAdapter adapter = new ItemAdapter(demoItem);
-        itemrecycleView.setAdapter(adapter);
-
+        itemRecycleView.setLayoutManager(llm);
+        try{
+            itemArray = new ArrayList<Item>(DBHelper.getAllItem().values());
+        }catch (Exception ex){
+            Toast errorMessage = Toast.makeText(MainActivity.this, ex.getMessage(), Toast.LENGTH_SHORT);
+            errorMessage.show();
+        }
+        adapter = new ItemAdapter(this, itemArray);
+        itemRecycleView.setAdapter(adapter);
+        addItemFab.setOnClickListener(this);
+        addThroughCameraFab.setOnClickListener(this);
     }
 
     @Override
@@ -69,9 +86,48 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initialiseData(){
-        demoItem = new ArrayList<>();
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Egg",1,new GregorianCalendar(2017,5,17),"#FFFF00",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Milk",1,new GregorianCalendar(2017,5,17),"#FFFF00",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Bread",1,new GregorianCalendar(2017,5,17),"#FFFF00",1));
+        //demoItem = new ArrayList<>();
+        /*demoItem.add(new Item(UUID.randomUUID().toString(),"Egg",1,new GregorianCalendar(2017,5,17),"#FFFF00",1));
+        demoItem.add(new Item(UUID.randomUUID().toString(),"Milk",1,new GregorianCalendar(2017,5,17),"#99CC66",1));
+        demoItem.add(new Item(UUID.randomUUID().toString(),"Bread",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
+        demoItem.add(new Item(UUID.randomUUID().toString(),"Bacon",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
+        demoItem.add(new Item(UUID.randomUUID().toString(),"Apple",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
+        demoItem.add(new Item(UUID.randomUUID().toString(),"Orange",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
+        demoItem.add(new Item(UUID.randomUUID().toString(),"Butter",1,new GregorianCalendar(2017,5,17),"#CC9999",1));*/
     }
+
+    @Override
+    public void onClick(View v) {
+        Intent newIntent;
+        switch (v.getId()){
+            case R.id.addItemFab:
+                newIntent = new Intent(this,ItemDetail.class);
+                startActivityForResult(newIntent, REQUEST_CONTENT_UPDATE);
+                break;
+            case R.id.addThroughCameraFab:
+                newIntent = new Intent(this,Item.class);
+                startActivityForResult(newIntent, REQUEST_CREATE_WITH_BARCODE);
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CONTENT_UPDATE) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    if (DBHelper.getAllItem().size() != itemArray.size()) {
+                        itemArray = new ArrayList<>(DBHelper.getAllItem().values());
+                        adapter.updateMonsters(itemArray);
+                    }
+
+                }
+            }
+        }
+    }
+
+
+
 }
