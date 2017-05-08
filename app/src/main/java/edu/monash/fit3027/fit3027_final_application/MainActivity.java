@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         itemArray = new ArrayList<>(DBHelper.getAllItem().values());
                         adapter.updateMonsters(itemArray);
                     }
+                } catch (Exception ex) {
 
                 }
             }

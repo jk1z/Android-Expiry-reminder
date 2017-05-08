@@ -32,6 +32,7 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
  * Created by Jack on 07-May-17.
  */
 
+public class ItemDetail extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, AdapterView.OnItemSelectedListener {
     private EditText itemNameEditText;
     private EditText amountEditText;
     private EditText barcodeEditText;
@@ -85,7 +86,9 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
     }
 
     @Override
+    public void onClick(View v) {
         Intent newIntent;
+        switch (v.getId()) {
             case R.id.clearAmountButton:
                 amountEditText.setText("");
                 break;
@@ -96,6 +99,7 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
                 expiryDateTextView.setText("Not Set");
                 break;
             case R.id.okButton:
+                try {
                     String itemName;
                     int itemQuantity;
                     Calendar itemExpiryDate;
@@ -112,13 +116,17 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
 
                     itemName = itemNameEditText.getText().toString();
                     itemQuantity = Integer.parseInt(amountEditText.getText().toString());
+                    itemExpiryDate = new GregorianCalendar(year, month, date);
                     //itemColorTag = colorTagImageButton.getBackground().toString();
                     itemColorTag = "@android:color/holo_orange_dark";
                     notifyDay = spinnerChoice;
                     itemBarcode = Long.parseLong(barcodeEditText.getText().toString());
+                    DBHelper.addItem(new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemExpiryDate, itemColorTag, notifyDay, itemBarcode));
 
                     newIntent = new Intent();
+                    setResult(RESULT_OK, newIntent);
                     finish();
+                } catch (Exception ex) {
                     Toast errorMessage = Toast.makeText(ItemDetail.this, ex.getMessage(), Toast.LENGTH_SHORT);
                     errorMessage.show();
                 }
@@ -126,8 +134,10 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
 
             case R.id.calenderImageButton:
                 Calendar now = new GregorianCalendar();
+                new DatePickerDialog(this, this, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DATE)).show();
                 break;
             case R.id.barcodeScanImageButton:
+                newIntent = new Intent(this, ItemScanner.class);
                 startActivityForResult(newIntent, REQUEST_BARCODE);
                 break;
             default:
@@ -140,12 +150,16 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
         this.year = year;
         this.month = month;
         this.date = dayOfMonth;
+        expiryDateTextView.setText(dayOfMonth + "-" + month + "-" + year);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (parent.getItemAtPosition(position) == "2 Days") {
             spinnerChoice = 2;
+        } else if (parent.getItemAtPosition(position) == "5 Days") {
             spinnerChoice = 5;
+        } else if (parent.getItemAtPosition(position) == "10 Days") {
             spinnerChoice = 10;
         }
     }
@@ -159,8 +173,10 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_BARCODE) {
             if (resultCode == RESULT_OK) {
+                if (data != null) {
                     Barcode barcode = data.getParcelableExtra("barcode");
                     barcodeEditText.setText(barcode.displayValue);
+                } else {
                     Toast errorMessage = Toast.makeText(ItemDetail.this, "Barcode not found", Toast.LENGTH_SHORT);
                     errorMessage.show();
                 }

@@ -42,13 +42,18 @@ public class ItemScanner extends AppCompatActivity implements SurfaceHolder.Call
                 .setRequestedPreviewSize(1600, 1024)
                 .build();
         cameraPreview.getHolder().addCallback(this);
+        barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
 
             public void release() {
 
             }
 
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodeSparseArray = detections.getDetectedItems();
+                if (barcodeSparseArray.size() > 0) {
                     Intent newIntent = new Intent();
+                    newIntent.putExtra("barcode", barcodeSparseArray.valueAt(0));
+                    setResult(RESULT_OK, newIntent);
                     finish();
                 }
             }
