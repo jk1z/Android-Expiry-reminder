@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(newIntent, REQUEST_CONTENT_UPDATE);
                 break;
             case R.id.addThroughCameraFab:
-                newIntent = new Intent(this,Item.class);
+                newIntent = new Intent(this,ItemDetail.class);
                 startActivityForResult(newIntent, REQUEST_CREATE_WITH_BARCODE);
                 break;
             default:

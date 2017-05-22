@@ -14,19 +14,20 @@
             android:layout_height="wrap_content"
             android:text="Item Bar code:"
             android:textSize="18sp"
+            android:layout_marginStart="29dp"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/textView"
-            android:layout_marginStart="15dp" />
+            android:layout_alignParentStart="true" />
 
         <EditText
             android:id="@+id/barcodeEditText"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/textView2"
             android:ems="10"
-            android:inputType="number" />
+            android:inputType="number"
+            android:layout_alignBaseline="@+id/textView2"
+            android:layout_alignBottom="@+id/textView2"
+            android:layout_toEndOf="@+id/textView2"
+            android:layout_marginStart="14dp" />
 
         <ImageButton
             android:id="@+id/barcodeScanImageButton"
@@ -34,9 +35,9 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             app:srcCompat="@android:drawable/ic_menu_camera"
-            android:layout_marginStart="14dp"
+            android:layout_marginEnd="13dp"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/barcodeEditText" />
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 
@@ -53,18 +54,18 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="31dp"
             android:text="Item Name"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/itemNameEditText"
-            android:layout_width="140dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="26dp"
+            android:ems="10"
+            android:inputType="textPersonName"
             android:layout_alignBaseline="@+id/textView5"
             android:layout_alignBottom="@+id/textView5"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="52dp"
-            android:ems="10"
-            android:inputType="textPersonName" />
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 
@@ -91,7 +92,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="31dp"
             android:text="Color Tag"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
     </RelativeLayout>
 
@@ -137,10 +138,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
+            android:layout_alignTop="@+id/calenderImageButton"
             android:layout_marginStart="32dp"
             android:text="Expiry date"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
     </RelativeLayout>
 
@@ -179,7 +180,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="35dp"
             android:text="Amount"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
     </RelativeLayout>
 
@@ -196,7 +197,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="37dp"
             android:text="Notify me"
-            android:textSize="24sp" />
+            android:textSize="18sp" />
 
         <Spinner
             android:id="@+id/NotifyChoiceSpinner"

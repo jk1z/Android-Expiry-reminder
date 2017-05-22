@@ -50,6 +50,8 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private int year;
     private int month;
     private int date;
+    private boolean isFetchFromServer = false;
+    private NetworkHelper networkHelper;
 
     public final static int REQUEST_BARCODE = 3;
 
@@ -73,6 +75,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
         DBHelper = new DatabaseHelper(getApplicationContext());
 
+        networkHelper = new NetworkHelper("FIT3027");
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.reminder_choice_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -122,7 +125,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     notifyDay = spinnerChoice;
                     itemBarcode = Long.parseLong(barcodeEditText.getText().toString());
                     DBHelper.addItem(new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemExpiryDate, itemColorTag, notifyDay, itemBarcode));
-
+                    networkHelper.submitBarcode(String.valueOf(itemBarcode),itemName);
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
                     finish();
@@ -130,6 +133,9 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     Toast errorMessage = Toast.makeText(ItemDetail.this, ex.getMessage(), Toast.LENGTH_SHORT);
                     errorMessage.show();
                 }
+
+
+
                 break;
 
             case R.id.calenderImageButton:
@@ -175,7 +181,15 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
             if (resultCode == RESULT_OK) {
                 if (data != null) {
                     Barcode barcode = data.getParcelableExtra("barcode");
+                    String itemName = data.getStringExtra("itemName");
                     barcodeEditText.setText(barcode.displayValue);
+                    if (!itemName.equals("")){
+                        itemNameEditText.setText(itemName);
+                        this.isFetchFromServer = true;
+                    }else{
+                        Toast errorMessage = Toast.makeText(ItemDetail.this, "No matching result from the server", Toast.LENGTH_SHORT);
+                        errorMessage.show();
+                    }
                 } else {
                     Toast errorMessage = Toast.makeText(ItemDetail.this, "Barcode not found", Toast.LENGTH_SHORT);
                     errorMessage.show();
