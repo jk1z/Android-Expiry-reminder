@@ -1,9 +1,15 @@
 package edu.monash.fit3027.fit3027_final_application;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -46,7 +52,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private Button okButton;
     private TextView expiryDateTextView;
     private DatabaseHelper DBHelper;
-    private int spinnerChoice;
+    private int spinnerChoice=2;
     private int year;
     private int month;
     private int date;
@@ -121,11 +127,16 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     itemQuantity = Integer.parseInt(amountEditText.getText().toString());
                     itemExpiryDate = new GregorianCalendar(year, month, date);
                     //itemColorTag = colorTagImageButton.getBackground().toString();
-                    itemColorTag = "@android:color/holo_orange_dark";
+                    itemColorTag = "#FF6666";
                     notifyDay = spinnerChoice;
                     itemBarcode = Long.parseLong(barcodeEditText.getText().toString());
                     DBHelper.addItem(new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemExpiryDate, itemColorTag, notifyDay, itemBarcode));
-                    networkHelper.submitBarcode(String.valueOf(itemBarcode),itemName);
+                    if (!isFetchFromServer){
+                        networkHelper.submitBarcode(String.valueOf(itemBarcode),itemName);
+                    }
+                    alarmMethod(itemName,notifyDay,itemExpiryDate);
+
+
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
                     finish();
@@ -197,4 +208,19 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
             }
         }
     }
+
+    private void alarmMethod(String itemName, int daysBefore, Calendar expiryDate){
+        Intent alarmIntent = new Intent(this, NotifyHelper.class);
+        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),100,alarmIntent,0);
+        expiryDate.add(Calendar.DAY_OF_MONTH, -daysBefore);
+        expiryDate.set(Calendar.HOUR,8);
+        expiryDate.set(Calendar.MINUTE,0);
+        expiryDate.set(Calendar.SECOND,0);
+        expiryDate.set(Calendar.AM_PM,Calendar.AM);
+        long alertTime = expiryDate.getTimeInMillis();
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP,alertTime,pendingIntent);
+    }
+
 }

@@ -44,6 +44,25 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             daysLeftTextView = (TextView) itemView.findViewById(R.id.daysLeftTextView);
             colorTagImageView = (ImageView) itemView.findViewById(R.id.colorTagImageView);
         }
+
+        public void bindViewHolder(Item item){
+
+        }
+    }
+
+    public class BannerRecyclerView extends RecyclerView.ViewHolder {
+
+
+        private ImageView bannerImageView;
+        private TextView bannerTextView;
+
+        BannerRecyclerView(View itemView) {
+            super(itemView);
+            bannerImageView = (ImageView) itemView.findViewById(R.id.bannerImageView);
+            bannerTextView = (TextView) itemView.findViewById(R.id.bannerTextView);
+        }
+
+
     }
 
     private List<Item> itemList;
@@ -56,43 +75,66 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         DBHelper = new DatabaseHelper(mContext);
     }
 
+    public int getItemViewType(int position){
+        if (position == 0){
+            return 0;
+        }
+        return 1;
+    }
+
+
 
     @Override
     public ItemAdapter.ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_item, parent, false);
-        ItemViewHolder itemViewHolder = new ItemViewHolder(v);
-        return itemViewHolder;
+        switch (viewType){
+            case 0:
+                View vBanner = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_banner, parent, false);
+                return new ItemViewHolder(vBanner);
+            case 1:
+                View vList = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_item, parent, false);
+                return new ItemViewHolder(vList);
+            default:
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_item, parent, false);
+                return new ItemViewHolder(v);
+        }
     }
 
     @Override
     public void onBindViewHolder(ItemAdapter.ItemViewHolder holder, final int position) {
-        Item item = itemList.get(position);
-        DateFormat displayDayOfWeek = new SimpleDateFormat("EEE");
-        holder.expiryDateTextView.setText(item.getItemExpiryDate().get(Calendar.DATE) + "/" + item.getItemExpiryDate().get(Calendar.MONTH) + " " + displayDayOfWeek.format(item.getItemExpiryDate().get(Calendar.DAY_OF_WEEK)));
-        holder.colorTagImageView.setBackgroundColor(0);
-        holder.itemQuantityTextView.setText("x" + item.getItemQuantity());
-        holder.daysLeftTextView.setText(item.daysLeft() + " days left");
-        holder.itemNameTextView.setText(item.getItemName());
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            public boolean onLongClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setMessage("Are Sure to delete this item?").setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        DBHelper.removeItem(itemList.get(position));
-                        try {
-                            ArrayList<Item> itemArray = new ArrayList<>(DBHelper.getAllItem().values());
-                            updateMonsters(itemArray);
-                        } catch (Exception ex) {
-                        }
+        switch (holder.getItemViewType()){
+            case 0:
+                break;
+            case 1:
+                Item item = itemList.get(position-1);
+                DateFormat displayDayOfWeek = new SimpleDateFormat("EEE");
+                holder.expiryDateTextView.setText(item.getItemExpiryDate().get(Calendar.DATE) + "/" + item.getItemExpiryDate().get(Calendar.MONTH) + " " + displayDayOfWeek.format(item.getItemExpiryDate().get(Calendar.DAY_OF_WEEK)));
+                holder.colorTagImageView.setBackgroundColor(Color.parseColor(item.getItemColorTag()));
+                holder.itemQuantityTextView.setText("x" + item.getItemQuantity());
+                holder.daysLeftTextView.setText(item.daysLeft() + " days left");
+                holder.itemNameTextView.setText(item.getItemName());
+                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    public boolean onLongClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setMessage("Are Sure to delete this item?").setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                DBHelper.removeItem(itemList.get(position-1));
+                                try {
+                                    ArrayList<Item> itemArray = new ArrayList<>(DBHelper.getAllItem().values());
+                                    updateMonsters(itemArray);
+                                } catch (Exception ex) {
+                                }
+                            }
+                        }).setNegativeButton("Cancel", null);
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                        return true;
                     }
-                }).setNegativeButton("Cancel", null);
-                AlertDialog alert = builder.create();
-                alert.show();
-                return true;
-            }
-        });
+                });
+        }
+
     }
+
 
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);

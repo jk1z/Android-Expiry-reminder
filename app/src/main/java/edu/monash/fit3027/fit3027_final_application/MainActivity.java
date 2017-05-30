@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adapter = new ItemAdapter(this, itemArray);
         itemRecycleView.setAdapter(adapter);
         addItemFab.setOnClickListener(this);
-        addThroughCameraFab.setOnClickListener(this);
+        //addThroughCameraFab.setOnClickListener(this);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package edu.monash.fit3027.fit3027_final_application;
 
 import android.net.Uri;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -66,9 +67,8 @@ public class NetworkHelper {
 
     public void submitBarcode(String barcode, String itemName){
         try{
-            URL url = new URL(BARCODE_QUERY_SERVER_URL + "submitBarcode.py?" + "barcode=" + barcode + "&"+"item_name="+itemName);
+            URL url = new URL(BARCODE_QUERY_SERVER_URL + "submitBarcode.py?" + "barcode=" + barcode + "&"+"item_name="+itemName +"&"+"apiKey="+this.apiKey);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            int responseCode = connection.getResponseCode();
             InputStream input = connection.getInputStream();
             String result = "";
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));

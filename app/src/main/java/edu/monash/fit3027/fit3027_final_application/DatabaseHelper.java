@@ -20,7 +20,7 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "ItemDB";
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 1;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -92,7 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-
+    //TODO: What data type to store the image
     public String encodeDate(Calendar calender) {
         return calender.get(Calendar.YEAR) + "-" + calender.get(Calendar.MONTH) + "-" + calender.get(Calendar.DATE);
     }

@@ -35,7 +35,6 @@ import java.net.URL;
 public class ItemScanner extends AppCompatActivity implements SurfaceHolder.Callback {
     private SurfaceView cameraPreview;
     private CameraSource cameraSource;
-    private String itemResult = "";
     private NetworkHelper networkHelper;
 
     @Override
@@ -51,7 +50,7 @@ public class ItemScanner extends AppCompatActivity implements SurfaceHolder.Call
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this).build();
         cameraSource = new CameraSource.Builder(this, barcodeDetector)
                 .setAutoFocusEnabled(true)
-                .setRequestedPreviewSize(1600, 1024)
+                .setRequestedPreviewSize(500, 500)
                 .build();
         cameraPreview.getHolder().addCallback(this);
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
@@ -61,7 +60,7 @@ public class ItemScanner extends AppCompatActivity implements SurfaceHolder.Call
             }
 
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                final SparseArray<Barcode> barcodeSparseArray = detections.getDetectedItems();
+                final SparseArray<Barcode> barcodeSparseArray = detections.getDetectedItems();//TODO:Need to crop the image and then feed in to the detector
                 if (barcodeSparseArray.size() > 0) {
                     Intent newIntent = new Intent();
                     String itemName = networkHelper.getItemByBarcode(barcodeSparseArray.valueAt(0).displayValue);
@@ -78,13 +77,11 @@ public class ItemScanner extends AppCompatActivity implements SurfaceHolder.Call
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.CAMERA)) {
+
+            }
             return;
         }
         try {
