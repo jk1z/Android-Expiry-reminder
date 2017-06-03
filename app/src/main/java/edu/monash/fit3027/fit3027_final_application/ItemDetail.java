@@ -52,7 +52,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private Button okButton;
     private TextView expiryDateTextView;
     private DatabaseHelper DBHelper;
-    private int spinnerChoice=2;
+    private int spinnerChoice = 2;
     private int year;
     private int month;
     private int date;
@@ -64,8 +64,6 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_detail);
-
-
         itemNameEditText = (EditText) findViewById(R.id.itemNameEditText);
         amountEditText = (EditText) findViewById(R.id.amountEditText);
         colorTagImageButton = (ImageButton) findViewById(R.id.colorTagImageButton);
@@ -92,8 +90,12 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         clearExpiryDateImageButton.setOnClickListener(this);
         clearAmountButton.setOnClickListener(this);
         barcodeScanImageButton.setOnClickListener(this);
+        Intent intent = getIntent();
+        if (intent.getBooleanExtra("addThroughCamera",false)){
+            Intent newIntent = new Intent(this, ItemScanner.class);
+            startActivityForResult(newIntent, REQUEST_BARCODE);
+        }
     }
-
     @Override
     public void onClick(View v) {
         Intent newIntent;
@@ -131,10 +133,10 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     notifyDay = spinnerChoice;
                     itemBarcode = Long.parseLong(barcodeEditText.getText().toString());
                     DBHelper.addItem(new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemExpiryDate, itemColorTag, notifyDay, itemBarcode));
-                    if (!isFetchFromServer){
-                        networkHelper.submitBarcode(String.valueOf(itemBarcode),itemName);
+                    if (!isFetchFromServer) {
+                        networkHelper.submitBarcode(String.valueOf(itemBarcode), itemName);
                     }
-                    alarmMethod(itemName,notifyDay,itemExpiryDate);
+                    alarmMethod(itemName, notifyDay, itemExpiryDate);
 
 
                     newIntent = new Intent();
@@ -144,11 +146,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     Toast errorMessage = Toast.makeText(ItemDetail.this, ex.getMessage(), Toast.LENGTH_SHORT);
                     errorMessage.show();
                 }
-
-
-
                 break;
-
             case R.id.calenderImageButton:
                 Calendar now = new GregorianCalendar();
                 new DatePickerDialog(this, this, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DATE)).show();
@@ -194,10 +192,10 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     Barcode barcode = data.getParcelableExtra("barcode");
                     String itemName = data.getStringExtra("itemName");
                     barcodeEditText.setText(barcode.displayValue);
-                    if (!itemName.equals("")){
+                    if (!itemName.equals("")) {
                         itemNameEditText.setText(itemName);
                         this.isFetchFromServer = true;
-                    }else{
+                    } else {
                         Toast errorMessage = Toast.makeText(ItemDetail.this, "No matching result from the server", Toast.LENGTH_SHORT);
                         errorMessage.show();
                     }
@@ -209,18 +207,18 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         }
     }
 
-    private void alarmMethod(String itemName, int daysBefore, Calendar expiryDate){
+    private void alarmMethod(String itemName, int daysBefore, Calendar expiryDate) {
         Intent alarmIntent = new Intent(this, NotifyHelper.class);
-        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),100,alarmIntent,0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, alarmIntent, 0);
         expiryDate.add(Calendar.DAY_OF_MONTH, -daysBefore);
-        expiryDate.set(Calendar.HOUR,8);
-        expiryDate.set(Calendar.MINUTE,0);
-        expiryDate.set(Calendar.SECOND,0);
-        expiryDate.set(Calendar.AM_PM,Calendar.AM);
+        expiryDate.set(Calendar.HOUR, 8);
+        expiryDate.set(Calendar.MINUTE, 0);
+        expiryDate.set(Calendar.SECOND, 0);
+        expiryDate.set(Calendar.AM_PM, Calendar.AM);
         long alertTime = expiryDate.getTimeInMillis();
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP,alertTime,pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alertTime, pendingIntent);
     }
 
 }

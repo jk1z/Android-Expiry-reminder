@@ -51,7 +51,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public HashMap<String, Item> getAllItem() throws Exception {
+    public HashMap<String, Item> getAllItem(){
         HashMap<String, Item> itemHashMap = new LinkedHashMap<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + Item.TABLE_NAME, null);
@@ -97,11 +97,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return calender.get(Calendar.YEAR) + "-" + calender.get(Calendar.MONTH) + "-" + calender.get(Calendar.DATE);
     }
 
-    public Calendar decodeDate(String dateString) throws Exception {
+    public Calendar decodeDate(String dateString) {
         String[] calendarString = dateString.split("-");
-        if (calendarString.length != 3) {
-            throw new NumberFormatException("Calendar is not valid");
-        }
         return new GregorianCalendar(Integer.parseInt(calendarString[0]), Integer.parseInt(calendarString[1]), Integer.parseInt(calendarString[2]));
     }
 

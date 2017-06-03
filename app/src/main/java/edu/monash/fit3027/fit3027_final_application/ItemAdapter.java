@@ -25,45 +25,7 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
  * Created by Jack on 08-May-17.
  */
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
-
-    public static class ItemViewHolder extends RecyclerView.ViewHolder {
-        CardView itemCardView;
-        TextView expiryDateTextView;
-        TextView itemNameTextView;
-        TextView itemQuantityTextView;
-        TextView daysLeftTextView;
-        ImageView colorTagImageView;
-
-        ItemViewHolder(View itemView) {
-            super(itemView);
-            itemCardView = (CardView) itemView.findViewById(R.id.itemCardView);
-            expiryDateTextView = (TextView) itemView.findViewById(R.id.expiryDateTextView);
-            itemNameTextView = (TextView) itemView.findViewById(R.id.itemNameTextView);
-            itemQuantityTextView = (TextView) itemView.findViewById(R.id.itemQuantityTextView);
-            daysLeftTextView = (TextView) itemView.findViewById(R.id.daysLeftTextView);
-            colorTagImageView = (ImageView) itemView.findViewById(R.id.colorTagImageView);
-        }
-
-        public void bindViewHolder(Item item){
-
-        }
-    }
-
-    public class BannerRecyclerView extends RecyclerView.ViewHolder {
-
-
-        private ImageView bannerImageView;
-        private TextView bannerTextView;
-
-        BannerRecyclerView(View itemView) {
-            super(itemView);
-            bannerImageView = (ImageView) itemView.findViewById(R.id.bannerImageView);
-            bannerTextView = (TextView) itemView.findViewById(R.id.bannerTextView);
-        }
-
-
-    }
+public class ItemAdapter extends RecyclerView.Adapter {
 
     private List<Item> itemList;
     private Context mContext;
@@ -75,24 +37,20 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         DBHelper = new DatabaseHelper(mContext);
     }
 
-    public int getItemViewType(int position){
-        if (position == 0){
+    public int getItemViewType(int position) {
+        if (position == 0) {
             return 0;
         }
         return 1;
     }
 
 
-
     @Override
-    public ItemAdapter.ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType){
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
             case 0:
                 View vBanner = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_banner, parent, false);
                 return new ItemViewHolder(vBanner);
-            case 1:
-                View vList = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_item, parent, false);
-                return new ItemViewHolder(vList);
             default:
                 View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_item, parent, false);
                 return new ItemViewHolder(v);
@@ -100,28 +58,22 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     }
 
     @Override
-    public void onBindViewHolder(ItemAdapter.ItemViewHolder holder, final int position) {
-        switch (holder.getItemViewType()){
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
             case 0:
                 break;
             case 1:
-                Item item = itemList.get(position-1);
-                DateFormat displayDayOfWeek = new SimpleDateFormat("EEE");
-                holder.expiryDateTextView.setText(item.getItemExpiryDate().get(Calendar.DATE) + "/" + item.getItemExpiryDate().get(Calendar.MONTH) + " " + displayDayOfWeek.format(item.getItemExpiryDate().get(Calendar.DAY_OF_WEEK)));
-                holder.colorTagImageView.setBackgroundColor(Color.parseColor(item.getItemColorTag()));
-                holder.itemQuantityTextView.setText("x" + item.getItemQuantity());
-                holder.daysLeftTextView.setText(item.daysLeft() + " days left");
-                holder.itemNameTextView.setText(item.getItemName());
-                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                final ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
+                itemViewHolder.bindViewHolder(this.itemList.get(position - 1));
+                itemViewHolder.setOnLongClickOnCardView(new View.OnLongClickListener() {
                     public boolean onLongClick(View v) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                         builder.setMessage("Are Sure to delete this item?").setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                DBHelper.removeItem(itemList.get(position-1));
+                                DBHelper.removeItem(itemViewHolder.getItem());
                                 try {
-                                    ArrayList<Item> itemArray = new ArrayList<>(DBHelper.getAllItem().values());
-                                    updateMonsters(itemArray);
+                                    updateMonsters();
                                 } catch (Exception ex) {
                                 }
                             }
@@ -131,8 +83,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                         return true;
                     }
                 });
+                break;
+            default:
+                break;
         }
-
     }
 
 
@@ -142,11 +96,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return itemList.size() + 1;
     }
 
-    public void updateMonsters(List<Item> items) {
-        this.itemList = items;
+    public void updateMonsters() {
+        this.itemList = new ArrayList<>(DBHelper.getAllItem().values());
         notifyDataSetChanged();
     }
 

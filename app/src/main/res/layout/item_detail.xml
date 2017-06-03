@@ -4,238 +4,276 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="56dp">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp">
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Item Bar code:"
-            android:textSize="18sp"
-            android:layout_marginStart="29dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp">
 
-        <EditText
-            android:id="@+id/barcodeEditText"
-            android:layout_width="160dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:layout_alignBaseline="@+id/textView2"
-            android:layout_alignBottom="@+id/textView2"
-            android:layout_toEndOf="@+id/textView2"
-            android:layout_marginStart="14dp" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="29dp"
+                android:text="Item Bar code:"
+                android:textSize="18sp" />
 
-        <ImageButton
-            android:id="@+id/barcodeScanImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            app:srcCompat="@android:drawable/ic_menu_camera"
-            android:layout_marginEnd="13dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true" />
+            <EditText
+                android:id="@+id/barcodeEditText"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/textView2"
+                android:layout_alignBottom="@+id/textView2"
+                android:layout_marginStart="14dp"
+                android:layout_toEndOf="@+id/textView2"
+                android:ems="10"
+                android:inputType="number" />
 
-    </RelativeLayout>
+            <ImageButton
+                android:id="@+id/barcodeScanImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="13dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
 
-    <RelativeLayout
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="63dp"
-        android:background="@drawable/bottom_gray_border">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp">
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="31dp"
-            android:text="Item Name"
-            android:textSize="18sp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="63dp">
 
-        <EditText
-            android:id="@+id/itemNameEditText"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="26dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:layout_alignBaseline="@+id/textView5"
-            android:layout_alignBottom="@+id/textView5"
-            android:layout_alignParentEnd="true" />
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="31dp"
+                android:text="Item Name"
+                android:textSize="18sp" />
 
-    </RelativeLayout>
+            <EditText
+                android:id="@+id/itemNameEditText"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/textView5"
+                android:layout_alignBottom="@+id/textView5"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="26dp"
+                android:ems="10"
+                android:inputType="textPersonName" />
 
-    <RelativeLayout
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="148dp"
-        android:background="@drawable/bottom_gray_border">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp">
 
-        <ImageButton
-            android:id="@+id/colorTagImageButton"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="73dp"
-            android:background="@android:color/transparent"
-            app:srcCompat="@android:color/holo_orange_dark" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="148dp">
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="31dp"
-            android:text="Color Tag"
-            android:textSize="18sp" />
+            <ImageButton
+                android:id="@+id/colorTagImageButton"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="73dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@android:color/holo_orange_dark" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="31dp"
+                android:text="Color Tag"
+                android:textSize="18sp" />
 
-    <RelativeLayout
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:background="@drawable/bottom_gray_border">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp">
 
-        <TextView
-            android:id="@+id/expiryDateTextView"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:text="Not Set"
-            android:textAlignment="center"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            android:layout_marginStart="30dp"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/textView11" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="65dp">
 
-        <ImageButton
-            android:id="@+id/clearExpiryDateImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/calenderImageButton"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            app:srcCompat="@android:drawable/ic_menu_delete" />
+            <TextView
+                android:id="@+id/expiryDateTextView"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="30dp"
+                android:layout_toEndOf="@+id/textView11"
+                android:text="Not Set"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
 
-        <ImageButton
-            android:id="@+id/calenderImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="17dp"
-            android:layout_toStartOf="@+id/clearExpiryDateImageButton"
-            android:background="@android:color/transparent"
-            app:srcCompat="@android:drawable/ic_menu_today" />
+            <ImageButton
+                android:id="@+id/clearExpiryDateImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@+id/calenderImageButton"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                app:srcCompat="@android:drawable/ic_menu_delete" />
 
-        <TextView
-            android:id="@+id/textView11"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/calenderImageButton"
-            android:layout_marginStart="32dp"
-            android:text="Expiry date"
-            android:textSize="18sp" />
+            <ImageButton
+                android:id="@+id/calenderImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="17dp"
+                android:layout_toStartOf="@+id/clearExpiryDateImageButton"
+                android:background="@android:color/transparent"
+                app:srcCompat="@android:drawable/ic_menu_today" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/expiryDateTextView"
+                android:layout_alignBottom="@+id/expiryDateTextView"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="32dp"
+                android:text="Expiry date"
+                android:textSize="18sp" />
 
-    <RelativeLayout
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="67dp"
-        android:background="@drawable/bottom_gray_border">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp">
 
-        <Button
-            android:id="@+id/clearAmountButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/textView12"
-            android:layout_alignBottom="@+id/textView12"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="21dp"
-            android:background="@android:color/transparent"
-            android:text="Clear"
-            android:textColor="#FF6666" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="67dp">
 
-        <EditText
-            android:id="@+id/amountEditText"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/clearAmountButton"
-            android:layout_marginEnd="24dp"
-            android:layout_toStartOf="@+id/clearAmountButton"
-            android:ems="10"
-            android:inputType="number" />
+            <Button
+                android:id="@+id/clearAmountButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/textView12"
+                android:layout_alignBottom="@+id/textView12"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="21dp"
+                android:background="@android:color/transparent"
+                android:text="Clear"
+                android:textColor="@color/colorAccent" />
 
-        <TextView
-            android:id="@+id/textView12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="35dp"
-            android:text="Amount"
-            android:textSize="18sp" />
+            <EditText
+                android:id="@+id/amountEditText"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/clearAmountButton"
+                android:layout_marginEnd="24dp"
+                android:layout_toStartOf="@+id/clearAmountButton"
+                android:ems="10"
+                android:inputType="number" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="32dp"
+                android:text="Amount"
+                android:textSize="18sp" />
 
-    <RelativeLayout
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="97dp"
-        android:background="@drawable/bottom_gray_border">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp">
 
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="37dp"
-            android:text="Notify me"
-            android:textSize="18sp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="97dp">
 
-        <Spinner
-            android:id="@+id/NotifyChoiceSpinner"
-            android:layout_width="130dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="37dp"
-            android:layout_toEndOf="@+id/textView9" />
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="37dp"
+                android:text="Notify me"
+                android:textSize="18sp" />
 
-    <RelativeLayout
+            <Spinner
+                android:id="@+id/NotifyChoiceSpinner"
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="37dp"
+                android:layout_toEndOf="@+id/textView9" />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/okButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/cancelButton"
-            android:layout_alignBottom="@+id/cancelButton"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            android:text="OK"
-            android:textColor="#FF6666"
-            android:textSize="18sp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/cancelButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="48dp"
-            android:layout_toStartOf="@+id/okButton"
-            android:background="@android:color/transparent"
-            android:text="Cancel"
-            android:textColor="#FF6666"
-            android:textSize="18sp" />
+            <Button
+                android:id="@+id/okButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/cancelButton"
+                android:layout_alignBottom="@+id/cancelButton"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                android:text="OK"
+                android:textColor="@color/colorAccent"
+                android:textSize="18sp" />
 
-    </RelativeLayout>
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="48dp"
+                android:layout_toStartOf="@+id/okButton"
+                android:background="@android:color/transparent"
+                android:text="Cancel"
+                android:textColor="@color/colorAccent"
+                android:textSize="18sp" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
 </LinearLayout>

@@ -26,11 +26,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView itemRecycleView;
     private FloatingActionButton addItemFab;
     private FloatingActionButton addThroughCameraFab;
-    private ArrayList<Item>itemArray;
+    private ArrayList<Item> itemArray;
     private DatabaseHelper DBHelper;
     private ItemAdapter adapter;
     public final static int REQUEST_CONTENT_UPDATE = 1;
-    public final static int REQUEST_CREATE_WITH_BARCODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,25 +41,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         addItemFab = (FloatingActionButton) findViewById(R.id.addItemFab);
         addThroughCameraFab = (FloatingActionButton) findViewById(R.id.addThroughCameraFab);
-        itemRecycleView = (RecyclerView)findViewById(R.id.itemRecyclerView);
-
-
+        itemRecycleView = (RecyclerView) findViewById(R.id.itemRecyclerView);
 
         setSupportActionBar(toolbar);
 
         itemRecycleView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         itemRecycleView.setLayoutManager(llm);
-        try{
+        try {
             itemArray = new ArrayList<Item>(DBHelper.getAllItem().values());
-        }catch (Exception ex){
+        } catch (Exception ex) {
             Toast errorMessage = Toast.makeText(MainActivity.this, ex.getMessage(), Toast.LENGTH_SHORT);
             errorMessage.show();
         }
         adapter = new ItemAdapter(this, itemArray);
         itemRecycleView.setAdapter(adapter);
         addItemFab.setOnClickListener(this);
-        //addThroughCameraFab.setOnClickListener(this);
+        addThroughCameraFab.setOnClickListener(this);
     }
 
     @Override
@@ -85,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    private void initialiseData(){
+    private void initialiseData() {
         //demoItem = new ArrayList<>();
         /*demoItem.add(new Item(UUID.randomUUID().toString(),"Egg",1,new GregorianCalendar(2017,5,17),"#FFFF00",1));
         demoItem.add(new Item(UUID.randomUUID().toString(),"Milk",1,new GregorianCalendar(2017,5,17),"#99CC66",1));
@@ -99,14 +96,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         Intent newIntent;
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.addItemFab:
-                newIntent = new Intent(this,ItemDetail.class);
+                newIntent = new Intent(this, ItemDetail.class);
                 startActivityForResult(newIntent, REQUEST_CONTENT_UPDATE);
                 break;
             case R.id.addThroughCameraFab:
-                newIntent = new Intent(this,ItemDetail.class);
-                startActivityForResult(newIntent, REQUEST_CREATE_WITH_BARCODE);
+                newIntent = new Intent(this, ItemDetail.class);
+                newIntent.putExtra("addThroughCamera",true);
+                startActivityForResult(newIntent, REQUEST_CONTENT_UPDATE);
                 break;
             default:
                 break;
@@ -117,18 +115,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CONTENT_UPDATE) {
             if (resultCode == RESULT_OK) {
-                try {
-                    if (DBHelper.getAllItem().size() != itemArray.size()) {
-                        itemArray = new ArrayList<>(DBHelper.getAllItem().values());
-                        adapter.updateMonsters(itemArray);
-                    }
-                } catch (Exception ex) {
-
+                if (DBHelper.getAllItem().size() != itemArray.size()) {
+                    adapter.updateMonsters();
                 }
             }
         }
     }
-
 
 
 }
