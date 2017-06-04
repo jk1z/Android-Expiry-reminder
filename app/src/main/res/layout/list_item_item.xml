@@ -6,12 +6,12 @@
     android:id="@+id/itemCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginTop="10dp">
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginTop="5dp">
 
     <LinearLayout
-        android:layout_width="390dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:weightSum="1">
@@ -62,12 +62,15 @@
 
             <TextView
                 android:id="@+id/daysLeftTextView"
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/itemQuantityTextView"
-                android:layout_toEndOf="@+id/itemNameTextView"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="17dp"
+                android:gravity="center"
                 android:text="2 Days left"
-                android:textColor="@android:color/black"
+                android:textColor="#00e676"
                 android:textSize="18sp" />
 
         </RelativeLayout>

@@ -26,9 +26,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.vision.barcode.Barcode;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -58,12 +61,14 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private int date;
     private boolean isFetchFromServer = false;
     private NetworkHelper networkHelper;
+    private Calendar itemExpiryDate;
 
     public final static int REQUEST_BARCODE = 3;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_detail);
+
         itemNameEditText = (EditText) findViewById(R.id.itemNameEditText);
         amountEditText = (EditText) findViewById(R.id.amountEditText);
         colorTagImageButton = (ImageButton) findViewById(R.id.colorTagImageButton);
@@ -111,12 +116,8 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                 break;
             case R.id.okButton:
                 try {
-                    String itemName;
-                    int itemQuantity;
-                    Calendar itemExpiryDate;
-                    String itemColorTag;
-                    int notifyDay;
-                    long itemBarcode;
+                    boolean barcodeNull = true;
+
                     //Always hide the Keyboard interface first
                     InputMethodManager inputManager =
                             (InputMethodManager) getApplicationContext().
@@ -125,19 +126,38 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                             v.getWindowToken(),
                             InputMethodManager.HIDE_NOT_ALWAYS);
 
-                    itemName = itemNameEditText.getText().toString();
-                    itemQuantity = Integer.parseInt(amountEditText.getText().toString());
-                    itemExpiryDate = new GregorianCalendar(year, month, date);
-                    //itemColorTag = colorTagImageButton.getBackground().toString();
-                    itemColorTag = "#FF6666";
-                    notifyDay = spinnerChoice;
-                    itemBarcode = Long.parseLong(barcodeEditText.getText().toString());
+                    long itemBarcode = 0;
+                    String itemBarcodeString = barcodeEditText.getText().toString();
+                    if (!itemBarcodeString.matches("")){
+                        barcodeNull = false;
+                        itemBarcode = Long.parseLong(itemBarcodeString);
+                    }
+
+                    String itemName = itemNameEditText.getText().toString();
+                    if (itemName.matches("")){
+                        Toast.makeText(this, "Please enter item name", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String itemColorTag = "#FF6666";
+
+                    String itemQuantityString = amountEditText.getText().toString();
+                    if (itemQuantityString.matches("")){
+                        Toast.makeText(this, "Please enter item amount", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    int itemQuantity = Integer.parseInt(itemQuantityString);
+
+                    int notifyDay = spinnerChoice;
+
+
                     DBHelper.addItem(new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemExpiryDate, itemColorTag, notifyDay, itemBarcode));
-                    if (!isFetchFromServer) {
+
+                    if (!isFetchFromServer & !barcodeNull) {
                         networkHelper.submitBarcode(String.valueOf(itemBarcode), itemName);
                     }
-                    alarmMethod(itemName, notifyDay, itemExpiryDate);
 
+                    alarmMethod(itemName, notifyDay, itemExpiryDate);
 
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
@@ -162,10 +182,9 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-        this.year = year;
-        this.month = month;
-        this.date = dayOfMonth;
-        expiryDateTextView.setText(dayOfMonth + "-" + month + "-" + year);
+        itemExpiryDate = new GregorianCalendar(year, month, dayOfMonth);
+        itemExpiryDate.set(Calendar.MILLISECOND, 0);
+        expiryDateTextView.setText(new SimpleDateFormat("dd-MMM-yy",Locale.getDefault()).format(itemExpiryDate.getTime()).replace(".",""));
     }
 
     @Override
@@ -189,9 +208,10 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         if (requestCode == REQUEST_BARCODE) {
             if (resultCode == RESULT_OK) {
                 if (data != null) {
-                    Barcode barcode = data.getParcelableExtra("barcode");
+//                    Barcode barcode = data.getParcelableExtra("barcode");
+                    String barcode = data.getStringExtra("barcode");
                     String itemName = data.getStringExtra("itemName");
-                    barcodeEditText.setText(barcode.displayValue);
+                    barcodeEditText.setText(barcode);
                     if (!itemName.equals("")) {
                         itemNameEditText.setText(itemName);
                         this.isFetchFromServer = true;

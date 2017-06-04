@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="edu.monash.fit3027.fit3027_final_application">
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -31,6 +32,10 @@
         <activity android:name=".ItemDetail" />
         <activity android:name=".ItemScanner"/>
         <receiver android:name=".NotifyHelper"/>
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation" />
     </application>
 
 </manifest>
