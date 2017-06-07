@@ -1,8 +1,10 @@
-package edu.monash.fit3027.fit3027_final_application;
+package edu.monash.fit3027.fit3027_final_application.UI.Adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
@@ -15,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import edu.monash.fit3027.fit3027_final_application.R;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 /**
@@ -46,13 +49,35 @@ public class ItemViewHolder extends ViewHolder{
         colorTagImageView = (ImageView) itemView.findViewById(R.id.colorTagImageView);
     }
 
-    public void bindViewHolder(Item item){
+    public void bindViewHolder(Item item,Context mContext){
                 this.item = item;
                 DateFormat displayDayOfWeek = new SimpleDateFormat("EEE");
                 expiryDateTextView.setText(item.getItemExpiryDate().get(Calendar.DATE) + "/" + item.getItemExpiryDate().get(Calendar.MONTH) + " " + displayDayOfWeek.format(item.getItemExpiryDate().get(Calendar.DAY_OF_WEEK)));
                 colorTagImageView.setBackgroundColor(Color.parseColor(item.getItemColorTag()));
                 itemQuantityTextView.setText("x" + item.getItemQuantity());
-                daysLeftTextView.setText(item.daysLeft() + " days left");
+                int daysLeft = item.daysLeft();
+                switch (daysLeft){
+                    case 0:case 1:
+                        daysLeftTextView.setTextColor(ContextCompat.getColor(mContext,R.color.colorAboutRot));
+                        break;
+                    case 2: case 3:case 4:
+                        daysLeftTextView.setTextColor(ContextCompat.getColor(mContext,R.color.colorOk));
+                        break;
+                    default:
+                        if (daysLeft < 0){
+                            daysLeftTextView.setTextColor(ContextCompat.getColor(mContext,R.color.colorRot));
+                        }else{
+                            daysLeftTextView.setTextColor(ContextCompat.getColor(mContext,R.color.colorFresh));
+                        }
+                        break;
+                }
+                if (daysLeft < 0){
+                    daysLeftTextView.setText("expired");
+                }else if (daysLeft == 0){
+                    daysLeftTextView.setText("expire today");
+                }else {
+                    daysLeftTextView.setText(item.daysLeft() + " days left");
+                }
                 itemNameTextView.setText(item.getItemName());
     }
 

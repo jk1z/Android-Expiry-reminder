@@ -1,4 +1,4 @@
-package edu.monash.fit3027.fit3027_final_application;
+package edu.monash.fit3027.fit3027_final_application.Helper;
 
 import android.content.ContentValues;
 import android.content.Context;

@@ -1,10 +1,8 @@
-package edu.monash.fit3027.fit3027_final_application;
+package edu.monash.fit3027.fit3027_final_application.UI.Activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,13 +10,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.UUID;
 
+import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
+import edu.monash.fit3027.fit3027_final_application.R;
+import edu.monash.fit3027.fit3027_final_application.UI.Adapter.ItemAdapter;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -49,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager llm = new LinearLayoutManager(this);
         itemRecycleView.setLayoutManager(llm);
         try {
-            itemArray = new ArrayList<Item>(DBHelper.getAllItem().values());
+            itemArray = new ArrayList<>(DBHelper.getAllItem().values());
         } catch (Exception ex) {
             Toast errorMessage = Toast.makeText(MainActivity.this, ex.getMessage(), Toast.LENGTH_SHORT);
             errorMessage.show();

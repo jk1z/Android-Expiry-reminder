@@ -1,15 +1,11 @@
-package edu.monash.fit3027.fit3027_final_application;
+package edu.monash.fit3027.fit3027_final_application.UI.Activity;
 
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -24,17 +20,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.vision.barcode.Barcode;
-
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Scanner;
 import java.util.UUID;
 
+import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
+import edu.monash.fit3027.fit3027_final_application.Helper.NetworkHelper.GetItemByBarcode;
+import edu.monash.fit3027.fit3027_final_application.Helper.NotifyHelper;
+import edu.monash.fit3027.fit3027_final_application.R;
+import edu.monash.fit3027.fit3027_final_application.Helper.NetworkHelper.SubmitBarcode;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 /**
@@ -56,12 +52,8 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private TextView expiryDateTextView;
     private DatabaseHelper DBHelper;
     private int spinnerChoice = 2;
-    private int year;
-    private int month;
-    private int date;
-    private boolean isFetchFromServer = false;
-    private NetworkHelper networkHelper;
     private Calendar itemExpiryDate;
+    private GetItemByBarcode getItemByBarcode;
 
     public final static int REQUEST_BARCODE = 3;
 
@@ -84,7 +76,6 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
         DBHelper = new DatabaseHelper(getApplicationContext());
 
-        networkHelper = new NetworkHelper("FIT3027");
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.reminder_choice_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -95,12 +86,17 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         clearExpiryDateImageButton.setOnClickListener(this);
         clearAmountButton.setOnClickListener(this);
         barcodeScanImageButton.setOnClickListener(this);
+
         Intent intent = getIntent();
-        if (intent.getBooleanExtra("addThroughCamera",false)){
+        if (intent.getBooleanExtra("addThroughCamera", false)) {
             Intent newIntent = new Intent(this, ItemScanner.class);
             startActivityForResult(newIntent, REQUEST_BARCODE);
         }
+
+
+
     }
+
     @Override
     public void onClick(View v) {
         Intent newIntent;
@@ -117,7 +113,6 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
             case R.id.okButton:
                 try {
                     boolean barcodeNull = true;
-
                     //Always hide the Keyboard interface first
                     InputMethodManager inputManager =
                             (InputMethodManager) getApplicationContext().
@@ -128,21 +123,26 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
                     long itemBarcode = 0;
                     String itemBarcodeString = barcodeEditText.getText().toString();
-                    if (!itemBarcodeString.matches("")){
+                    if (!itemBarcodeString.matches("")) {
                         barcodeNull = false;
                         itemBarcode = Long.parseLong(itemBarcodeString);
                     }
 
                     String itemName = itemNameEditText.getText().toString();
-                    if (itemName.matches("")){
+                    if (itemName.matches("")) {
                         Toast.makeText(this, "Please enter item name", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     String itemColorTag = "#FF6666";
 
+                    if (itemExpiryDate == null){
+                        Toast.makeText(this, "Please set a expiry date", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     String itemQuantityString = amountEditText.getText().toString();
-                    if (itemQuantityString.matches("")){
+                    if (itemQuantityString.matches("")) {
                         Toast.makeText(this, "Please enter item amount", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -152,9 +152,12 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
 
                     DBHelper.addItem(new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemExpiryDate, itemColorTag, notifyDay, itemBarcode));
-
-                    if (!isFetchFromServer & !barcodeNull) {
-                        networkHelper.submitBarcode(String.valueOf(itemBarcode), itemName);
+                    if (!barcodeNull) {
+                        if (this.getItemByBarcode != null) {
+                            if (!getItemByBarcode.isFromServer()) {
+                                new SubmitBarcode(String.valueOf(itemBarcode), itemName).execute();
+                            }
+                        }
                     }
 
                     alarmMethod(itemName, notifyDay, itemExpiryDate);
@@ -162,6 +165,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
                     finish();
+
                 } catch (Exception ex) {
                     Toast errorMessage = Toast.makeText(ItemDetail.this, ex.getMessage(), Toast.LENGTH_SHORT);
                     errorMessage.show();
@@ -184,7 +188,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
         itemExpiryDate = new GregorianCalendar(year, month, dayOfMonth);
         itemExpiryDate.set(Calendar.MILLISECOND, 0);
-        expiryDateTextView.setText(new SimpleDateFormat("dd-MMM-yy",Locale.getDefault()).format(itemExpiryDate.getTime()).replace(".",""));
+        expiryDateTextView.setText(new SimpleDateFormat("dd-MMM-yy", Locale.getDefault()).format(itemExpiryDate.getTime()).replace(".", ""));
     }
 
     @Override
@@ -208,27 +212,28 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         if (requestCode == REQUEST_BARCODE) {
             if (resultCode == RESULT_OK) {
                 if (data != null) {
-//                    Barcode barcode = data.getParcelableExtra("barcode");
                     String barcode = data.getStringExtra("barcode");
-                    String itemName = data.getStringExtra("itemName");
-                    barcodeEditText.setText(barcode);
-                    if (!itemName.equals("")) {
-                        itemNameEditText.setText(itemName);
-                        this.isFetchFromServer = true;
+                    if (!barcode.equals("")) {
+                        getItemByBarcode = new GetItemByBarcode(this, itemNameEditText, barcode);
+                        getItemByBarcode.execute();
+                        barcodeEditText.setText(barcode);
                     } else {
-                        Toast errorMessage = Toast.makeText(ItemDetail.this, "No matching result from the server", Toast.LENGTH_SHORT);
+                        Toast errorMessage = Toast.makeText(ItemDetail.this, "Barcode not found", Toast.LENGTH_SHORT);
                         errorMessage.show();
                     }
-                } else {
-                    Toast errorMessage = Toast.makeText(ItemDetail.this, "Barcode not found", Toast.LENGTH_SHORT);
+                }else{
+                    Toast errorMessage = Toast.makeText(ItemDetail.this, "Please allow camera permission", Toast.LENGTH_SHORT);
                     errorMessage.show();
                 }
             }
         }
     }
 
+
     private void alarmMethod(String itemName, int daysBefore, Calendar expiryDate) {
         Intent alarmIntent = new Intent(this, NotifyHelper.class);
+        alarmIntent.putExtra("itemName",itemName);
+        alarmIntent.putExtra("daysBefore",daysBefore);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, alarmIntent, 0);
         expiryDate.add(Calendar.DAY_OF_MONTH, -daysBefore);

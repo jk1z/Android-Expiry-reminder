@@ -1,24 +1,18 @@
-package edu.monash.fit3027.fit3027_final_application;
+package edu.monash.fit3027.fit3027_final_application.UI.Adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
+import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
+import edu.monash.fit3027.fit3027_final_application.R;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 /**
@@ -64,7 +58,7 @@ public class ItemAdapter extends RecyclerView.Adapter {
                 break;
             case 1:
                 final ItemViewHolder itemViewHolder = (ItemViewHolder) holder;
-                itemViewHolder.bindViewHolder(this.itemList.get(position - 1));
+                itemViewHolder.bindViewHolder(this.itemList.get(position - 1),mContext);
                 itemViewHolder.setOnLongClickOnCardView(new View.OnLongClickListener() {
                     public boolean onLongClick(View v) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
