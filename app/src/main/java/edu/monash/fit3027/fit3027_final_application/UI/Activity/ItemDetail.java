@@ -101,6 +101,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         clearAmountButton.setOnClickListener(this);
         barcodeScanImageButton.setOnClickListener(this);
         colorTagImageButton.setOnClickListener(this);
+        notifyChoiceSpinner.setOnItemSelectedListener(this);
 
         Intent intent = getIntent();
         if (intent.getBooleanExtra("addThroughCamera", false)) {
@@ -179,8 +180,12 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                         }
                     }
 
-                    alarmMethod(item);
-
+                    if (notifyDay > 0){
+                        alarmMethod(item,notifyDay);
+                    }
+                    if (item.daysLeftInt() >= 0) {
+                        alarmMethod(item, 0);
+                    }
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
                     finish();
@@ -221,8 +226,9 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         Resources res = getResources();
         List<String> choices = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.reminder_choice_array)));
         if (diffDay < 2) {
-            choices.clear();
-            choices.add("No Option");
+            choices.remove(choices.size()-1);
+            choices.remove(choices.size()-1);
+            choices.remove(choices.size()-1);
             spinnerChoice = 0;
         } else if (diffDay < 5) {
             choices.remove(choices.size()-1);
@@ -237,6 +243,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                 choices);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         notifyChoiceSpinner.setAdapter(adapter);
+        notifyChoiceSpinner.setOnItemSelectedListener(this);
     }
 
     @Override
@@ -295,14 +302,14 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     }
 
 
-    private void alarmMethod(Item item) {
+    private void alarmMethod(Item item, int notificationDay) {
         Intent alarmIntent = new Intent(this, NotifyHelper.class);
-        alarmIntent.putExtra("daysLeftInt",item.daysLeftInt());
+        alarmIntent.putExtra("daysLeft",notificationDay);
         alarmIntent.putExtra("itemName",item.getItemName());
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, alarmIntent, 0);
         Calendar expiryDate = item.getItemExpiryDate();
-        expiryDate.add(Calendar.DAY_OF_MONTH, - item.getNotifyDay());
+        expiryDate.add(Calendar.DAY_OF_MONTH, - notificationDay);
         expiryDate.set(Calendar.HOUR, 8);
         expiryDate.set(Calendar.MINUTE, 0);
         expiryDate.set(Calendar.SECOND, 0);

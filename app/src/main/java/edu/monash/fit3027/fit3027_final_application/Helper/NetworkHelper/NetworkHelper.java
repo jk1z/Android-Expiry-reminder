@@ -8,6 +8,6 @@ import android.os.AsyncTask;
 
 public abstract class NetworkHelper extends AsyncTask<String, Void, String> {
     String apiKey = "FIT3027";
-    String BARCODE_QUERY_SERVER_URL = "http://54.66.221.2/cgi-bin/";
+    String BARCODE_QUERY_SERVER_URL = "http://52.65.177.140/cgi-bin/";
 
 }

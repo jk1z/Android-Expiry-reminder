@@ -32,7 +32,7 @@ public class NotifyHelper extends BroadcastReceiver {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, newIntent, 0);
 
         String itemName = intent.getStringExtra("itemName");
-        int daysLeft = intent.getIntExtra("daysLeftInt",0);
+        int daysLeft = intent.getIntExtra("daysLeft",0);
         String daysLeftString;
         if (daysLeft < 0){
             daysLeftString = itemName + " is expired";
