@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -21,8 +22,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -41,6 +45,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private EditText itemNameEditText;
     private EditText amountEditText;
     private EditText barcodeEditText;
+    private EditText itemTypeEditText;
     private ImageButton colorTagImageButton;
     private ImageButton calenderImageButton;
     private ImageButton clearExpiryDateImageButton;
@@ -50,12 +55,15 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private Button cancelButton;
     private Button okButton;
     private TextView expiryDateTextView;
+
     private DatabaseHelper DBHelper;
     private int spinnerChoice = 2;
     private Calendar itemExpiryDate;
     private GetItemByBarcode getItemByBarcode;
+    private String itemColorTag = "#ff5722";
 
     public final static int REQUEST_BARCODE = 3;
+    public final static int REQUEST_COLOR_TAG = 4;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,27 +81,32 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         barcodeEditText = (EditText) findViewById(R.id.barcodeEditText);
         barcodeScanImageButton = (ImageButton) findViewById((R.id.barcodeScanImageButton));
         expiryDateTextView = (TextView) findViewById((R.id.expiryDateTextView));
+        itemTypeEditText = (EditText) findViewById(R.id.itemTypeEditText);
+
 
         DBHelper = new DatabaseHelper(getApplicationContext());
+
+        colorTagImageButton.setBackgroundColor(Color.parseColor(itemColorTag));
+
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.reminder_choice_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         notifyChoiceSpinner.setAdapter(adapter);
+
         calenderImageButton.setOnClickListener(this);
         cancelButton.setOnClickListener(this);
         okButton.setOnClickListener(this);
         clearExpiryDateImageButton.setOnClickListener(this);
         clearAmountButton.setOnClickListener(this);
         barcodeScanImageButton.setOnClickListener(this);
+        colorTagImageButton.setOnClickListener(this);
 
         Intent intent = getIntent();
         if (intent.getBooleanExtra("addThroughCamera", false)) {
             Intent newIntent = new Intent(this, ItemScanner.class);
             startActivityForResult(newIntent, REQUEST_BARCODE);
         }
-
-
 
     }
 
@@ -109,6 +122,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                 break;
             case R.id.clearExpiryDateImageButton:
                 expiryDateTextView.setText("Not Set");
+                itemExpiryDate = null;
                 break;
             case R.id.okButton:
                 try {
@@ -134,9 +148,8 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                         return;
                     }
 
-                    String itemColorTag = "#FF6666";
 
-                    if (itemExpiryDate == null){
+                    if (itemExpiryDate == null) {
                         Toast.makeText(this, "Please set a expiry date", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -148,10 +161,16 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     }
                     int itemQuantity = Integer.parseInt(itemQuantityString);
 
+                    String itemType = itemTypeEditText.getText().toString();
+                    if (itemType.matches("")) {
+                        Toast.makeText(this, "Please enter item unit", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     int notifyDay = spinnerChoice;
 
-
-                    DBHelper.addItem(new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemExpiryDate, itemColorTag, notifyDay, itemBarcode));
+                    Item item = new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemType, itemExpiryDate, itemColorTag, notifyDay, itemBarcode);
+                    DBHelper.addItem(item);
                     if (!barcodeNull) {
                         if (this.getItemByBarcode != null) {
                             if (!getItemByBarcode.isFromServer()) {
@@ -160,7 +179,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                         }
                     }
 
-                    alarmMethod(itemName, notifyDay, itemExpiryDate);
+                    alarmMethod(item);
 
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
@@ -179,6 +198,10 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                 newIntent = new Intent(this, ItemScanner.class);
                 startActivityForResult(newIntent, REQUEST_BARCODE);
                 break;
+            case R.id.colorTagImageButton:
+                newIntent = new Intent(this, ColorSelectionGridView.class);
+                startActivityForResult(newIntent, REQUEST_COLOR_TAG);
+                break;
             default:
                 break;
         }
@@ -189,16 +212,43 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         itemExpiryDate = new GregorianCalendar(year, month, dayOfMonth);
         itemExpiryDate.set(Calendar.MILLISECOND, 0);
         expiryDateTextView.setText(new SimpleDateFormat("dd-MMM-yy", Locale.getDefault()).format(itemExpiryDate.getTime()).replace(".", ""));
+
+        Calendar now = new GregorianCalendar();
+        int startDate = now.get(Calendar.DAY_OF_MONTH);
+        int endDate = itemExpiryDate.get(Calendar.DAY_OF_MONTH);
+        int diffDay = endDate - startDate;
+
+        Resources res = getResources();
+        List<String> choices = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.reminder_choice_array)));
+        if (diffDay < 2) {
+            choices.clear();
+            choices.add("No Option");
+            spinnerChoice = 0;
+        } else if (diffDay < 5) {
+            choices.remove(choices.size()-1);
+            choices.remove(choices.size()-1);
+        } else if (diffDay < 10) {
+            choices.remove(choices.size()-1);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                choices);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        notifyChoiceSpinner.setAdapter(adapter);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (parent.getItemAtPosition(position) == "2 Days") {
+        if (parent.getItemAtPosition(position).equals("2 Days Before")) {
             spinnerChoice = 2;
-        } else if (parent.getItemAtPosition(position) == "5 Days") {
+        } else if (parent.getItemAtPosition(position).equals("5 Days Before")) {
             spinnerChoice = 5;
-        } else if (parent.getItemAtPosition(position) == "10 Days") {
+        } else if (parent.getItemAtPosition(position).equals("10 Days Before")) {
             spinnerChoice = 10;
+        } else if (parent.getItemAtPosition(position).equals("No Option")){
+            spinnerChoice = 0;
         }
     }
 
@@ -209,34 +259,50 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_BARCODE) {
-            if (resultCode == RESULT_OK) {
-                if (data != null) {
-                    String barcode = data.getStringExtra("barcode");
-                    if (!barcode.equals("")) {
-                        getItemByBarcode = new GetItemByBarcode(this, itemNameEditText, barcode);
-                        getItemByBarcode.execute();
-                        barcodeEditText.setText(barcode);
+        switch (requestCode) {
+            case REQUEST_BARCODE:
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        String barcode = data.getStringExtra("barcode");
+                        if (!barcode.equals("")) {
+                            getItemByBarcode = new GetItemByBarcode(this, itemNameEditText, barcode);
+                            getItemByBarcode.execute();
+                            barcodeEditText.setText(barcode);
+                        } else {
+                            Toast errorMessage = Toast.makeText(ItemDetail.this, "Barcode not found", Toast.LENGTH_SHORT);
+                            errorMessage.show();
+                        }
                     } else {
-                        Toast errorMessage = Toast.makeText(ItemDetail.this, "Barcode not found", Toast.LENGTH_SHORT);
+                        Toast errorMessage = Toast.makeText(ItemDetail.this, "Please allow camera permission", Toast.LENGTH_SHORT);
                         errorMessage.show();
                     }
-                }else{
-                    Toast errorMessage = Toast.makeText(ItemDetail.this, "Please allow camera permission", Toast.LENGTH_SHORT);
-                    errorMessage.show();
                 }
-            }
+                break;
+            case REQUEST_COLOR_TAG:
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        String colorTag = data.getStringExtra("colorTag");
+                        if (!colorTag.equals("")) {
+                            colorTagImageButton.setBackgroundColor(Color.parseColor(colorTag));
+                            this.itemColorTag = colorTag;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
 
-    private void alarmMethod(String itemName, int daysBefore, Calendar expiryDate) {
+    private void alarmMethod(Item item) {
         Intent alarmIntent = new Intent(this, NotifyHelper.class);
-        alarmIntent.putExtra("itemName",itemName);
-        alarmIntent.putExtra("daysBefore",daysBefore);
+        alarmIntent.putExtra("daysLeftInt",item.daysLeftInt());
+        alarmIntent.putExtra("itemName",item.getItemName());
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, alarmIntent, 0);
-        expiryDate.add(Calendar.DAY_OF_MONTH, -daysBefore);
+        Calendar expiryDate = item.getItemExpiryDate();
+        expiryDate.add(Calendar.DAY_OF_MONTH, - item.getNotifyDay());
         expiryDate.set(Calendar.HOUR, 8);
         expiryDate.set(Calendar.MINUTE, 0);
         expiryDate.set(Calendar.SECOND, 0);

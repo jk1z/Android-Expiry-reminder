@@ -66,10 +66,7 @@ public class ItemAdapter extends RecyclerView.Adapter {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 DBHelper.removeItem(itemViewHolder.getItem());
-                                try {
-                                    updateMonsters();
-                                } catch (Exception ex) {
-                                }
+                                updateMonsters();
                             }
                         }).setNegativeButton("Cancel", null);
                         AlertDialog alert = builder.create();

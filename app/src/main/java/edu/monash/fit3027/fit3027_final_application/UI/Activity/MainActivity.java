@@ -46,12 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         itemRecycleView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         itemRecycleView.setLayoutManager(llm);
-        try {
-            itemArray = new ArrayList<>(DBHelper.getAllItem().values());
-        } catch (Exception ex) {
-            Toast errorMessage = Toast.makeText(MainActivity.this, ex.getMessage(), Toast.LENGTH_SHORT);
-            errorMessage.show();
-        }
+        itemArray = new ArrayList<>(DBHelper.getAllItem().values());
         adapter = new ItemAdapter(this, itemArray);
         itemRecycleView.setAdapter(adapter);
         addItemFab.setOnClickListener(this);
@@ -75,21 +70,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if (id == R.id.action_about){
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void initialiseData() {
-        //demoItem = new ArrayList<>();
-        /*demoItem.add(new Item(UUID.randomUUID().toString(),"Egg",1,new GregorianCalendar(2017,5,17),"#FFFF00",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Milk",1,new GregorianCalendar(2017,5,17),"#99CC66",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Bread",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Bacon",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Apple",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Orange",1,new GregorianCalendar(2017,5,17),"#CC9999",1));
-        demoItem.add(new Item(UUID.randomUUID().toString(),"Butter",1,new GregorianCalendar(2017,5,17),"#CC9999",1));*/
-    }
 
     @Override
     public void onClick(View v) {

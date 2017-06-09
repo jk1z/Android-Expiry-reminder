@@ -12,6 +12,7 @@ import android.net.Uri;
 
 import edu.monash.fit3027.fit3027_final_application.R;
 import edu.monash.fit3027.fit3027_final_application.UI.Activity.MainActivity;
+import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -27,22 +28,29 @@ public class NotifyHelper extends BroadcastReceiver {
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        Intent newIntent = new Intent(context,MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context,0 ,newIntent,0);
+        Intent newIntent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, newIntent, 0);
 
         String itemName = intent.getStringExtra("itemName");
-        int daysBefore = intent.getIntExtra("daysBefore",0);
-
+        int daysLeft = intent.getIntExtra("daysLeftInt",0);
+        String daysLeftString;
+        if (daysLeft < 0){
+            daysLeftString = itemName + " is expired";
+        }else if (daysLeft == 0){
+            daysLeftString = itemName + " is expire today";
+        }else{
+            daysLeftString = itemName + " is about to expire in " + daysLeft + " days";
+        }
         Notification mNotify = new Notification.Builder(context)
                 .setContentTitle("Expiry Reminder")
-                .setContentText(itemName+" is about to expire in " + daysBefore+" days")
+                .setContentText(daysLeftString)
                 .setSmallIcon(R.drawable.ic_date_range_black_24dp)
                 .setContentIntent(pendingIntent)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setAutoCancel(true)
                 .setSound(sound)
                 .build();
-        notificationManager.notify(1,mNotify);
+        notificationManager.notify(1, mNotify);
     }
 }
 

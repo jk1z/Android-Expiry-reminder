@@ -53,12 +53,12 @@
 
             <TextView
                 android:id="@+id/itemQuantityTextView"
-                android:layout_width="50dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/expiryDateTextView"
                 android:layout_below="@+id/expiryDateTextView"
-                android:layout_marginTop="5dp"
-                android:text="x00000" />
+                android:layout_marginTop="0dp"
+                android:text="00000" />
 
             <TextView
                 android:id="@+id/daysLeftTextView"
@@ -72,6 +72,16 @@
                 android:text="2 Days left"
                 android:textColor="#00e676"
                 android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/itemTypeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/itemQuantityTextView"
+                android:layout_alignBottom="@+id/itemQuantityTextView"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@+id/itemQuantityTextView"
+                android:text="pcs" />
 
         </RelativeLayout>
 

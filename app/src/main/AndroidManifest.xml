@@ -31,6 +31,8 @@
         </activity>
         <activity android:name=".UI.Activity.ItemDetail" />
         <activity android:name=".UI.Activity.ItemScanner"/>
+        <activity android:name=".UI.Activity.ColorSelectionGridView"/>
+        <activity android:name=".UI.Activity.AboutPage"/>
         <receiver android:name=".Helper.NotifyHelper"/>
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"

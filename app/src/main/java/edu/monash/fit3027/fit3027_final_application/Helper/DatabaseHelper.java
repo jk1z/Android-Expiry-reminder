@@ -20,7 +20,7 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "ItemDB";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -33,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + Item.TABLE_NAME); //TODO: Probably need to move user data to the new database
+        db.execSQL("DROP TABLE IF EXISTS " + Item.TABLE_NAME);
         onCreate(db);
     }
 
@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Item.COLUMN_ID, item.getItemID());
         values.put(Item.COLUMN_NAME, item.getItemName());
         values.put(Item.COLUMN_QUANTITY, item.getItemQuantity());
+        values.put(Item.COLUMN_ITEM_TYPE, item.getItemType());
         values.put(Item.COLUMN_DATE, encodeDate(item.getItemExpiryDate()));
         values.put(Item.COLUMN_COLOR_TAG, item.getItemColorTag());
         values.put(Item.COLUMN_NOTIFY_DAY, item.getNotifyDay());
@@ -60,10 +61,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Item item = new Item(cursor.getString(0),
                         cursor.getString(1),
                         cursor.getInt(2),
-                        decodeDate(cursor.getString(3)),
-                        cursor.getString(4),
-                        cursor.getInt(5),
-                        cursor.getLong(6));
+                        cursor.getString(3),
+                        decodeDate(cursor.getString(4)),
+                        cursor.getString(5),
+                        cursor.getInt(6),
+                        cursor.getLong(7));
                 itemHashMap.put(item.getItemID(), item);
             } while (cursor.moveToNext());
         }
@@ -77,6 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Item.COLUMN_ID, item.getItemID());
         values.put(Item.COLUMN_NAME, item.getItemName());
         values.put(Item.COLUMN_QUANTITY, item.getItemQuantity());
+        values.put(Item.COLUMN_ITEM_TYPE,item.getItemType());
         values.put(Item.COLUMN_DATE, encodeDate(item.getItemExpiryDate()));
         values.put(Item.COLUMN_COLOR_TAG, item.getItemColorTag());
         values.put(Item.COLUMN_NOTIFY_DAY, item.getNotifyDay());
@@ -92,12 +95,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    //TODO: What data type to store the image
-    public String encodeDate(Calendar calender) {
+    private String encodeDate(Calendar calender) {
         return calender.get(Calendar.YEAR) + "-" + calender.get(Calendar.MONTH) + "-" + calender.get(Calendar.DATE);
     }
 
-    public Calendar decodeDate(String dateString) {
+    private Calendar decodeDate(String dateString) {
         String[] calendarString = dateString.split("-");
         return new GregorianCalendar(Integer.parseInt(calendarString[0]), Integer.parseInt(calendarString[1]), Integer.parseInt(calendarString[2]));
     }
