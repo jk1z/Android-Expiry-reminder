@@ -2,9 +2,11 @@ package edu.monash.fit3027.fit3027_final_application.Helper;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -12,6 +14,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 
+import edu.monash.fit3027.fit3027_final_application.R;
+import edu.monash.fit3027.fit3027_final_application.model.ColorTag;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 /**
@@ -21,20 +25,36 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "ItemDB";
     public static final int DATABASE_VERSION = 1;
+    private Context mContext;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(Item.CREATE_STATEMENT);
+        db.execSQL(ColorTag.CREATE_STATEMENT);
+        populateColorTag(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + Item.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ColorTag.TABLE_NAME);
         onCreate(db);
+    }
+
+    private void populateColorTag(SQLiteDatabase db){
+        Resources res = mContext.getResources();
+        String[] colorSelection = res.getStringArray(R.array.colorTagHex);
+        for (String colorHex: colorSelection){
+            ContentValues values = new ContentValues();
+            values.put(ColorTag.COLUMN_ID, colorHex);
+            values.put(ColorTag.COLUMN_DESCRIPTION, "");
+            db.insert(ColorTag.TABLE_NAME,null,values);
+        }
     }
 
     public void addItem(Item item) {
@@ -49,6 +69,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Item.COLUMN_NOTIFY_DAY, item.getNotifyDay());
         values.put(Item.COLUMN_BARCODE, item.getItemBarcode());
         db.insert(Item.TABLE_NAME, null, values);
+        db.close();
+    }
+
+
+    public void addColor(String colorHex, String content){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ColorTag.COLUMN_ID, colorHex);
+        values.put(ColorTag.COLUMN_DESCRIPTION, content);
+        db.insert(ColorTag.TABLE_NAME,null,values);
         db.close();
     }
 
@@ -73,10 +103,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return itemHashMap;
     }
 
+    public HashMap<String, String> getAllColorTag(){
+        HashMap<String, String> colorTagHashMap = new LinkedHashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + ColorTag.TABLE_NAME, null);
+        if (cursor.moveToFirst()) {
+            do {
+                colorTagHashMap.put(cursor.getString(0), cursor.getString(1));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return colorTagHashMap;
+    }
+
+    public void updateColor(String colorTagID, String colorDescription) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ColorTag.COLUMN_DESCRIPTION, colorDescription);
+        int affect = db.update(ColorTag.TABLE_NAME, values, ColorTag.COLUMN_ID + " = ?", new String[]{colorTagID});
+        Log.v("I",String.valueOf(affect));
+    }
+
     public void updateItem(Item item) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(Item.COLUMN_ID, item.getItemID());
         values.put(Item.COLUMN_NAME, item.getItemName());
         values.put(Item.COLUMN_QUANTITY, item.getItemQuantity());
         values.put(Item.COLUMN_ITEM_TYPE,item.getItemType());

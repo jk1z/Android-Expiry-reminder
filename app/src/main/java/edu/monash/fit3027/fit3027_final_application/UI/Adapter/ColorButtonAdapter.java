@@ -15,10 +15,10 @@ import edu.monash.fit3027.fit3027_final_application.R;
  * Created by Jack on 06-Jun-17.
  */
 
-public class colorButtonAdapter extends BaseAdapter {
+public class ColorButtonAdapter extends BaseAdapter {
     private Context mContext;
     private String[] colorHexArray;
-    public colorButtonAdapter(Context context,String[] colorHexArray){
+    public ColorButtonAdapter(Context context, String[] colorHexArray){
         this.mContext = context;
         this.colorHexArray = colorHexArray;
     }

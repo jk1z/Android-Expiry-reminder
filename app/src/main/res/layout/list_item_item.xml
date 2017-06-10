@@ -8,22 +8,13 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
-    android:layout_marginTop="5dp">
+    android:layout_marginTop="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:weightSum="1">
-
-        <ImageView
-            android:id="@+id/colorTagImageView"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_green_dark"
-            android:minHeight="80dp"
-            android:visibility="visible"
-            app:srcCompat="@android:color/transparent" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -35,7 +26,7 @@
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="40dp"
                 android:layout_marginTop="5dp"
                 android:text="No Name"
                 android:textSize="18sp" />
@@ -57,6 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/expiryDateTextView"
                 android:layout_below="@+id/expiryDateTextView"
+                android:layout_marginBottom="3dp"
                 android:layout_marginTop="0dp"
                 android:text="00000" />
 

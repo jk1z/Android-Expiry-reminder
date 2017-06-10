@@ -7,10 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import edu.monash.fit3027.fit3027_final_application.R;
-import edu.monash.fit3027.fit3027_final_application.UI.Adapter.colorButtonAdapter;
+import edu.monash.fit3027.fit3027_final_application.UI.Adapter.ColorButtonAdapter;
+
 
 /**
  * Created by Jack on 06-Jun-17.
@@ -34,7 +34,7 @@ public class ColorSelectionGridView extends AppCompatActivity implements Adapter
         Resources res = getResources();
         colorSelection = res.getStringArray(R.array.colorTagHex);
         GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new colorButtonAdapter(this,colorSelection));
+        gridview.setAdapter(new ColorButtonAdapter(this,colorSelection));
         gridview.setOnItemClickListener(this);
     }
 

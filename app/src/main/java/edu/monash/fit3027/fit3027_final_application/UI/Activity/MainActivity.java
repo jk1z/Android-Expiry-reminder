@@ -10,13 +10,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
 import edu.monash.fit3027.fit3027_final_application.R;
-import edu.monash.fit3027.fit3027_final_application.UI.Adapter.ItemAdapter;
+import edu.monash.fit3027.fit3027_final_application.UI.Adapter.ExpandableAdapter.ColorTagCatAdapter;
+import edu.monash.fit3027.fit3027_final_application.model.ColorTag;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -26,7 +29,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton addThroughCameraFab;
     private ArrayList<Item> itemArray;
     private DatabaseHelper DBHelper;
-    private ItemAdapter adapter;
+    //private ItemAdapter adapter;
+    private ColorTagCatAdapter adapter;
     public final static int REQUEST_CONTENT_UPDATE = 1;
 
     @Override
@@ -47,7 +51,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager llm = new LinearLayoutManager(this);
         itemRecycleView.setLayoutManager(llm);
         itemArray = new ArrayList<>(DBHelper.getAllItem().values());
-        adapter = new ItemAdapter(this, itemArray);
+
+
+        List colorGroup = createGroups(itemArray);
+        adapter = new ColorTagCatAdapter(colorGroup,this);
+
+        //adapter = new ItemAdapter(this, itemArray);
         itemRecycleView.setAdapter(adapter);
         addItemFab.setOnClickListener(this);
         addThroughCameraFab.setOnClickListener(this);
@@ -70,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        }else if (id == R.id.action_about){
+        } else if (id == R.id.action_about) {
             return true;
         }
 
@@ -88,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.addThroughCameraFab:
                 newIntent = new Intent(this, ItemDetail.class);
-                newIntent.putExtra("addThroughCamera",true);
+                newIntent.putExtra("addThroughCamera", true);
                 startActivityForResult(newIntent, REQUEST_CONTENT_UPDATE);
                 break;
             default:
@@ -101,10 +110,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == REQUEST_CONTENT_UPDATE) {
             if (resultCode == RESULT_OK) {
                 if (DBHelper.getAllItem().size() != itemArray.size()) {
-                    adapter.updateMonsters();
+                    adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values()));
                 }
             }
         }
+    }
+
+    private List<ColorTag> createGroups(ArrayList<Item> itemArray) {
+        HashMap<String, List<Item>> colorItemHashMap = new HashMap<>();
+        for (Item item : itemArray) {
+            if (!colorItemHashMap.containsKey(item.getItemColorTag())) {
+                List<Item> itemList = new ArrayList<>();
+                itemList.add(item);
+                colorItemHashMap.put(item.getItemColorTag(), itemList);
+            } else {
+                colorItemHashMap.get(item.getItemColorTag()).add(item);
+            }
+        }
+
+        HashMap<String, String> colorTagHashMap = DBHelper.getAllColorTag();
+
+        List<ColorTag> colorTagWithItems = new ArrayList<>();
+
+        Iterator<String> keySetIterator = colorItemHashMap.keySet().iterator();
+        while (keySetIterator.hasNext()) {
+            String key = keySetIterator.next();
+            ColorTag colorTag = new ColorTag(key,colorItemHashMap.get(key),colorTagHashMap.get(key));
+            colorTagWithItems.add(colorTag);
+        }
+        return colorTagWithItems;
     }
 
 
