@@ -1,6 +1,8 @@
 package edu.monash.fit3027.fit3027_final_application.UI.Adapter.ExpandableAdapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.view.View;
@@ -15,6 +17,7 @@ import java.util.Locale;
 
 import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
 import edu.monash.fit3027.fit3027_final_application.R;
+import edu.monash.fit3027.fit3027_final_application.UI.Activity.ItemDetail;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 /**
@@ -80,4 +83,9 @@ public class ItemViewHolder extends ChildViewHolder {
     public void setOnLongClickOnCardView(View.OnLongClickListener listener) {
         itemCardView.setOnLongClickListener(listener);
     }
+
+    public void setOnClickOnCardView(View.OnClickListener listener){
+        itemCardView.setOnClickListener(listener);
+    }
+
 }

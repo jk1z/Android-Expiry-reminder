@@ -1,7 +1,9 @@
 package edu.monash.fit3027.fit3027_final_application.UI.Adapter.ExpandableAdapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -17,6 +19,8 @@ import java.util.List;
 
 import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
 import edu.monash.fit3027.fit3027_final_application.R;
+import edu.monash.fit3027.fit3027_final_application.UI.Activity.ItemDetail;
+import edu.monash.fit3027.fit3027_final_application.UI.Activity.MainActivity;
 import edu.monash.fit3027.fit3027_final_application.model.ColorTag;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
@@ -24,12 +28,12 @@ import edu.monash.fit3027.fit3027_final_application.model.Item;
  * Created by Jack on 9/6/17.
  */
 
-public class ColorTagCatAdapter extends ExpandableRecyclerAdapter<ColorTag,Item,ColorTagViewHolder, ItemViewHolder> {
+public class ItemExpandableAdapter extends ExpandableRecyclerAdapter<ColorTag,Item,ColorTagViewHolder, ItemViewHolder>{
 
     private Context mContext;
     private LayoutInflater mInflater;
     private DatabaseHelper DBHelper;
-    public ColorTagCatAdapter(List<ColorTag> groups, Context context) {
+    public ItemExpandableAdapter(List<ColorTag> groups, Context context) {
         super(groups);
         this.mContext = context;
         mInflater = LayoutInflater.from(context);
@@ -72,36 +76,20 @@ public class ColorTagCatAdapter extends ExpandableRecyclerAdapter<ColorTag,Item,
                 alert.show();
                 return true;
             }});
+        childViewHolder.setOnClickOnCardView(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newIntent = new Intent(mContext, ItemDetail.class);
+                newIntent.putExtra("item",child);
+                ((Activity)mContext).startActivityForResult(newIntent, MainActivity.REQUEST_CONTENT_UPDATE);
+            }
+        });
     }
 
     public void updateView(ArrayList<Item> itemArrayList){
-        setParentList(createGroups(itemArrayList),true);
+        setParentList(DBHelper.createGroups(itemArrayList),true);
     }
 
-    private List<ColorTag> createGroups(ArrayList<Item> itemArray) {
-        HashMap<String, List<Item>> colorItemHashMap = new HashMap<>();
-        for (Item item : itemArray) {
-            if (!colorItemHashMap.containsKey(item.getItemColorTag())) {
-                List<Item> itemList = new ArrayList<>();
-                itemList.add(item);
-                colorItemHashMap.put(item.getItemColorTag(), itemList);
-            } else {
-                colorItemHashMap.get(item.getItemColorTag()).add(item);
-            }
-        }
-
-        HashMap<String, String> colorTagHashMap = DBHelper.getAllColorTag();
-
-        List<ColorTag> colorTagWithItems = new ArrayList<>();
-
-        Iterator<String> keySetIterator = colorItemHashMap.keySet().iterator();
-        while (keySetIterator.hasNext()) {
-            String key = keySetIterator.next();
-            ColorTag colorTag = new ColorTag(key,colorItemHashMap.get(key),colorTagHashMap.get(key));
-            colorTagWithItems.add(colorTag);
-        }
-        return colorTagWithItems;
-    }
 
 
 }

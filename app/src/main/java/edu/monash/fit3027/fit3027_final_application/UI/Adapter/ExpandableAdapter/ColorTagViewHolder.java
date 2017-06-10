@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bignerdranch.expandablerecyclerview.ParentViewHolder;
+import com.google.android.gms.common.data.DataBuffer;
 
 import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
 import edu.monash.fit3027.fit3027_final_application.R;
@@ -30,6 +31,7 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
     private ImageView arrowImageView;
     private String colorHex;
     private Context mContext;
+    private DatabaseHelper DBHelper;
 
     public ColorTagViewHolder(View itemView) {
         super(itemView);
@@ -37,6 +39,7 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
         categoryEditText = (TextView) itemView.findViewById(R.id.categoryEditText);
         colorTagCatImageView = (ImageView) itemView.findViewById(R.id.colorTagCatImageView);
         arrowImageView = (ImageView) itemView.findViewById(R.id.arrowImageView);
+        DBHelper = new DatabaseHelper(mContext);
         categoryEditText.setOnEditorActionListener(this);
 
     }
@@ -81,7 +84,7 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        DatabaseHelper databaseHelper = new DatabaseHelper(mContext);
+
         if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                 actionId == EditorInfo.IME_ACTION_DONE ||
                 actionId == EditorInfo.IME_ACTION_GO ||
@@ -98,7 +101,7 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
             categoryEditText.setFocusable(false);
             categoryEditText.setClickable(true);
             categoryEditText.clearFocus();
-            databaseHelper.updateColor(colorHex, categoryEditText.getText().toString());
+            DBHelper.updateColor(colorHex, categoryEditText.getText().toString());
             return true; // consume.
 
         }

@@ -28,4 +28,15 @@
         <item>#ec407a</item>
         <item>#ef5350</item>
     </string-array>
+    <string name="about">App Name: Expiry Reminder\nThird-Party Library used:\n
+\nExpandable RecyclerView underMIT LicenseLicense File: \nhttps://github.com/bignerdranch/expandable-recycler-view/blob/master/LICENSE\n
+\nZXing underApache License 2.0License File:\nhttps://github.com/zxing/zxing/blob/master/LICENSE\n\nNotice File:\nhttps://github.com/zxing/zxing/blob/master/NOTICENo changes has been madeCopyright: https://github.com/zxing/zxing/blob/master/AUTHORS
+\n\nExternal Resources used:
+\n\nGuide: How to implement Expandable RecyclerView\nhttp://bignerdranch.github.io/expandable-recycler-view/
+
+\n\nGuide: How to implement ZXing\nhttps://github.com/zxing/zxing/wiki/Scanning-Via-Intent
+
+\n\nGuide: How to set up nofiticiation alarm\nhttps://developer.android.com/guide/topics/ui/notifiers/notifications.html
+
+\n\nGuide: How to make editText editable\nhttps://stackoverflow.com/questions/13411407/editable-textview-on-click#</string>
 </resources>

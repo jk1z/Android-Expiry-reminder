@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -55,12 +56,13 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     private Button cancelButton;
     private Button okButton;
     private TextView expiryDateTextView;
+    private Item targetItem;
 
     private DatabaseHelper DBHelper;
-    private int spinnerChoice = 2;
+    private int spinnerChoice = 0;
     private Calendar itemExpiryDate;
     private GetItemByBarcode getItemByBarcode;
-    private String itemColorTag = "#ff5722";
+    private String itemColorTag = "#ef5350";
 
     public final static int REQUEST_BARCODE = 3;
     public final static int REQUEST_COLOR_TAG = 4;
@@ -82,13 +84,8 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         barcodeScanImageButton = (ImageButton) findViewById((R.id.barcodeScanImageButton));
         expiryDateTextView = (TextView) findViewById((R.id.expiryDateTextView));
         itemTypeEditText = (EditText) findViewById(R.id.itemTypeEditText);
-
-
         DBHelper = new DatabaseHelper(getApplicationContext());
-
         colorTagImageButton.setBackgroundColor(Color.parseColor(itemColorTag));
-
-
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.reminder_choice_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -104,10 +101,30 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         notifyChoiceSpinner.setOnItemSelectedListener(this);
 
         Intent intent = getIntent();
+
+        Item item = intent.getParcelableExtra("item");
+        if (item != null){
+            this.targetItem = item;
+            barcodeEditText.setText(String.valueOf(item.getItemBarcode()));
+            itemNameEditText.setText(item.getItemName());
+            colorTagImageButton.setBackgroundColor(Color.parseColor(item.getItemColorTag()));
+            itemColorTag = item.getItemColorTag();
+            itemExpiryDate = item.getItemExpiryDate();
+            expiryDateTextView.setText(new SimpleDateFormat("dd-MMM-yy", Locale.getDefault()).format(itemExpiryDate.getTime()).replace(".", ""));
+            amountEditText.setText(String.valueOf(item.getItemQuantity()));
+            itemTypeEditText.setText(item.getItemType());
+            changeSpinnerChoice();
+            //TODO:Change expiry date
+        }
+
+
         if (intent.getBooleanExtra("addThroughCamera", false)) {
             Intent newIntent = new Intent(this, ItemScanner.class);
             startActivityForResult(newIntent, REQUEST_BARCODE);
         }
+
+
+
 
     }
 
@@ -169,22 +186,34 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                     }
 
                     int notifyDay = spinnerChoice;
-
-                    Item item = new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemType, itemExpiryDate, itemColorTag, notifyDay, itemBarcode);
-                    DBHelper.addItem(item);
-                    if (!barcodeNull) {
-                        if (this.getItemByBarcode != null) {
-                            if (!getItemByBarcode.isFromServer()) {
-                                new SubmitBarcode(String.valueOf(itemBarcode), itemName).execute();
+                    Item item;
+                    if (this.targetItem == null) {
+                        item = new Item(UUID.randomUUID().toString(), itemName, itemQuantity, itemType, itemExpiryDate, itemColorTag, notifyDay, itemBarcode);
+                        DBHelper.addItem(item);
+                        if (!barcodeNull) {
+                            if (this.getItemByBarcode != null) {
+                                if (!getItemByBarcode.isFromServer()) {
+                                    new SubmitBarcode(String.valueOf(itemBarcode), itemName).execute();
+                                }
                             }
                         }
+                    }else{
+                        targetItem.setItemBarcode(itemBarcode);
+                        targetItem.setItemName(itemName);
+                        targetItem.setItemQuantity(itemQuantity);
+                        targetItem.setItemType(itemType);
+                        targetItem.setItemExpiryDate(itemExpiryDate);
+                        targetItem.setItemColorTag(itemColorTag);
+                        targetItem.setNotifyDay(notifyDay);
+                        DBHelper.updateItem(targetItem);
+                        item = targetItem;
                     }
 
                     if (notifyDay > 0){
-                        alarmMethod(item,notifyDay);
+                        alarmMethod(item,notifyDay,createID());
                     }
-                    if (item.daysLeftInt() >= 0) {
-                        alarmMethod(item, 0);
+                    if (item.daysLeftInt() >= 0 & targetItem == null) {
+                        alarmMethod(item, 0,createID());
                     }
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
@@ -217,33 +246,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         itemExpiryDate = new GregorianCalendar(year, month, dayOfMonth);
         itemExpiryDate.set(Calendar.MILLISECOND, 0);
         expiryDateTextView.setText(new SimpleDateFormat("dd-MMM-yy", Locale.getDefault()).format(itemExpiryDate.getTime()).replace(".", ""));
-
-        Calendar now = new GregorianCalendar();
-        int startDate = now.get(Calendar.DAY_OF_MONTH);
-        int endDate = itemExpiryDate.get(Calendar.DAY_OF_MONTH);
-        int diffDay = endDate - startDate;
-
-        Resources res = getResources();
-        List<String> choices = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.reminder_choice_array)));
-        if (diffDay < 2) {
-            choices.remove(choices.size()-1);
-            choices.remove(choices.size()-1);
-            choices.remove(choices.size()-1);
-            spinnerChoice = 0;
-        } else if (diffDay < 5) {
-            choices.remove(choices.size()-1);
-            choices.remove(choices.size()-1);
-        } else if (diffDay < 10) {
-            choices.remove(choices.size()-1);
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_spinner_item,
-                choices);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        notifyChoiceSpinner.setAdapter(adapter);
-        notifyChoiceSpinner.setOnItemSelectedListener(this);
+        changeSpinnerChoice();
     }
 
     @Override
@@ -261,7 +264,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        spinnerChoice = 2;
+        spinnerChoice = 0;
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -302,14 +305,14 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
     }
 
 
-    private void alarmMethod(Item item, int notificationDay) {
+    private void alarmMethod(Item item, int notificationDay, int alertID) {
         Intent alarmIntent = new Intent(this, NotifyHelper.class);
         alarmIntent.putExtra("daysLeft",notificationDay);
         alarmIntent.putExtra("itemName",item.getItemName());
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 100, alarmIntent, 0);
-        Calendar expiryDate = item.getItemExpiryDate();
-        expiryDate.add(Calendar.DAY_OF_MONTH, - notificationDay);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), alertID, alarmIntent, 0);
+        Calendar expiryDate = (Calendar) item.getItemExpiryDate().clone();
+        expiryDate.add(Calendar.DAY_OF_MONTH, -notificationDay);
         expiryDate.set(Calendar.HOUR, 8);
         expiryDate.set(Calendar.MINUTE, 0);
         expiryDate.set(Calendar.SECOND, 0);
@@ -317,6 +320,39 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         long alertTime = expiryDate.getTimeInMillis();
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, alertTime, pendingIntent);
+    }
+
+    private void changeSpinnerChoice(){
+        Calendar now = new GregorianCalendar();
+        int startDate = now.get(Calendar.DAY_OF_MONTH);
+        int endDate = itemExpiryDate.get(Calendar.DAY_OF_MONTH);
+        int diffDay = endDate - startDate;
+        Resources res = getResources();
+        List<String> choices = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.reminder_choice_array)));
+        if (diffDay < 2) {
+            choices.remove(choices.size()-1);
+            choices.remove(choices.size()-1);
+            choices.remove(choices.size()-1);
+            spinnerChoice = 0;
+        } else if (diffDay < 5) {
+            choices.remove(choices.size()-1);
+            choices.remove(choices.size()-1);
+        } else if (diffDay < 10) {
+            choices.remove(choices.size()-1);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_spinner_item,
+                choices);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        notifyChoiceSpinner.setAdapter(adapter);
+        notifyChoiceSpinner.setOnItemSelectedListener(this);
+    }
+
+    public int createID(){
+        Date now = new Date();
+        return Integer.parseInt(new SimpleDateFormat("ddHHmmssSS",  Locale.getDefault()).format(now))%655335;
     }
 
 }

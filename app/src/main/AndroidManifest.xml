@@ -5,7 +5,8 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -14,11 +15,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <meta-data android:name="com.google.gms.version"
+        <meta-data
+            android:name="com.google.gms.version"
             android:value="@integer/google_play_services_version" />
         <meta-data
-            android:name ="com.google.android.gms.vision.DEPENDENCIES"
-            android:value="barcode"/>
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" />
+
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAI-UPRO_806zLlnOo5RWBl8MzCH2ae0PEDnS1dIA" />
 
         <activity
             android:name=".UI.Activity.MainActivity"
@@ -30,10 +36,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".UI.Activity.ItemDetail" />
-        <activity android:name=".UI.Activity.ItemScanner"/>
-        <activity android:name=".UI.Activity.ColorSelectionGridView"/>
-        <activity android:name=".UI.Activity.AboutPage"/>
-        <receiver android:name=".Helper.NotifyHelper"/>
+        <activity android:name=".UI.Activity.ItemScanner" />
+        <activity android:name=".UI.Activity.ColorSelectionGridView" />
+        <activity android:name=".UI.Activity.AboutPage" />
+
+        <receiver android:name=".Helper.NotifyHelper" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"

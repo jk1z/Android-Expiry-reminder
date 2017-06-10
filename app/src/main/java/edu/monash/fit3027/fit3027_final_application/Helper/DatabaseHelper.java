@@ -8,10 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 
 import edu.monash.fit3027.fit3027_final_application.R;
@@ -69,18 +72,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(Item.COLUMN_NOTIFY_DAY, item.getNotifyDay());
         values.put(Item.COLUMN_BARCODE, item.getItemBarcode());
         db.insert(Item.TABLE_NAME, null, values);
-        db.close();
     }
 
-
-    public void addColor(String colorHex, String content){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(ColorTag.COLUMN_ID, colorHex);
-        values.put(ColorTag.COLUMN_DESCRIPTION, content);
-        db.insert(ColorTag.TABLE_NAME,null,values);
-        db.close();
-    }
 
     public HashMap<String, Item> getAllItem(){
         HashMap<String, Item> itemHashMap = new LinkedHashMap<>();
@@ -103,7 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return itemHashMap;
     }
 
-    public HashMap<String, String> getAllColorTag(){
+    private HashMap<String, String> getAllColorTag(){
         HashMap<String, String> colorTagHashMap = new LinkedHashMap<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + ColorTag.TABLE_NAME, null);
@@ -142,7 +135,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete(Item.TABLE_NAME,
                 Item.COLUMN_ID + " = ?",
                 new String[]{item.getItemID()});
-        db.close();
     }
 
     private String encodeDate(Calendar calender) {
@@ -152,6 +144,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private Calendar decodeDate(String dateString) {
         String[] calendarString = dateString.split("-");
         return new GregorianCalendar(Integer.parseInt(calendarString[0]), Integer.parseInt(calendarString[1]), Integer.parseInt(calendarString[2]));
+    }
+
+    public List<ColorTag> createGroups(ArrayList<Item> itemArray) {
+        HashMap<String, List<Item>> colorItemHashMap = new HashMap<>();
+        for (Item item : itemArray) {
+            if (!colorItemHashMap.containsKey(item.getItemColorTag())) {
+                List<Item> itemList = new ArrayList<>();
+                itemList.add(item);
+                colorItemHashMap.put(item.getItemColorTag(), itemList);
+            } else {
+                colorItemHashMap.get(item.getItemColorTag()).add(item);
+            }
+        }
+
+        HashMap<String, String> colorTagHashMap = this.getAllColorTag();
+
+        List<ColorTag> colorTagWithItems = new ArrayList<>();
+
+        Iterator<String> keySetIterator = colorItemHashMap.keySet().iterator();
+        while (keySetIterator.hasNext()) {
+            String key = keySetIterator.next();
+            ColorTag colorTag = new ColorTag(key,colorItemHashMap.get(key),colorTagHashMap.get(key));
+            colorTagWithItems.add(colorTag);
+        }
+        return colorTagWithItems;
     }
 
 }

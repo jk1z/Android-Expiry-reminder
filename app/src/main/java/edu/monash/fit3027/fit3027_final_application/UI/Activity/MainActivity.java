@@ -18,7 +18,7 @@ import java.util.List;
 
 import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
 import edu.monash.fit3027.fit3027_final_application.R;
-import edu.monash.fit3027.fit3027_final_application.UI.Adapter.ExpandableAdapter.ColorTagCatAdapter;
+import edu.monash.fit3027.fit3027_final_application.UI.Adapter.ExpandableAdapter.ItemExpandableAdapter;
 import edu.monash.fit3027.fit3027_final_application.model.ColorTag;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<Item> itemArray;
     private DatabaseHelper DBHelper;
     //private ItemAdapter adapter;
-    private ColorTagCatAdapter adapter;
+    private ItemExpandableAdapter adapter;
     public final static int REQUEST_CONTENT_UPDATE = 1;
 
     @Override
@@ -51,15 +51,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LinearLayoutManager llm = new LinearLayoutManager(this);
         itemRecycleView.setLayoutManager(llm);
         itemArray = new ArrayList<>(DBHelper.getAllItem().values());
-
-
-        List colorGroup = createGroups(itemArray);
-        adapter = new ColorTagCatAdapter(colorGroup,this);
+        adapter = new ItemExpandableAdapter(DBHelper.createGroups(itemArray),this);
 
         //adapter = new ItemAdapter(this, itemArray);
         itemRecycleView.setAdapter(adapter);
         addItemFab.setOnClickListener(this);
         addThroughCameraFab.setOnClickListener(this);
+    }
+
+    protected void onResume(){
+        super.onResume();
+        adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values()));
     }
 
     @Override
@@ -80,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_about) {
-            return true;
+            Intent newIntent = new Intent(this, AboutPage.class);
+            startActivity(newIntent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -109,37 +112,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CONTENT_UPDATE) {
             if (resultCode == RESULT_OK) {
-                if (DBHelper.getAllItem().size() != itemArray.size()) {
                     adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values()));
-                }
             }
         }
     }
 
-    private List<ColorTag> createGroups(ArrayList<Item> itemArray) {
-        HashMap<String, List<Item>> colorItemHashMap = new HashMap<>();
-        for (Item item : itemArray) {
-            if (!colorItemHashMap.containsKey(item.getItemColorTag())) {
-                List<Item> itemList = new ArrayList<>();
-                itemList.add(item);
-                colorItemHashMap.put(item.getItemColorTag(), itemList);
-            } else {
-                colorItemHashMap.get(item.getItemColorTag()).add(item);
-            }
-        }
-
-        HashMap<String, String> colorTagHashMap = DBHelper.getAllColorTag();
-
-        List<ColorTag> colorTagWithItems = new ArrayList<>();
-
-        Iterator<String> keySetIterator = colorItemHashMap.keySet().iterator();
-        while (keySetIterator.hasNext()) {
-            String key = keySetIterator.next();
-            ColorTag colorTag = new ColorTag(key,colorItemHashMap.get(key),colorTagHashMap.get(key));
-            colorTagWithItems.add(colorTag);
-        }
-        return colorTagWithItems;
-    }
 
 
 }
