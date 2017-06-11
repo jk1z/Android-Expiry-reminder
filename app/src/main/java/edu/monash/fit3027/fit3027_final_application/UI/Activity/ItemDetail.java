@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -37,6 +38,13 @@ import edu.monash.fit3027.fit3027_final_application.Helper.NotifyHelper;
 import edu.monash.fit3027.fit3027_final_application.R;
 import edu.monash.fit3027.fit3027_final_application.Helper.NetworkHelper.SubmitBarcode;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
+
+import static edu.monash.fit3027.fit3027_final_application.UI.Activity.SettingPage.DEFAULT_NOTIFY_OFF;
+import static edu.monash.fit3027.fit3027_final_application.UI.Activity.SettingPage.DEFAULT_NOTIFY_ON;
+import static edu.monash.fit3027.fit3027_final_application.UI.Activity.SettingPage.DEFAULT_NOTIFY_SETTING;
+import static edu.monash.fit3027.fit3027_final_application.UI.Activity.SettingPage.DEFAULT_NOTIFY_TIME_EVENING;
+import static edu.monash.fit3027.fit3027_final_application.UI.Activity.SettingPage.DEFAULT_NOTIFY_TIME_MORNING;
+import static edu.monash.fit3027.fit3027_final_application.UI.Activity.SettingPage.DEFAULT_NOTIFY_TIME_SETTING;
 
 /**
  * Created by Jack on 07-May-17.
@@ -213,7 +221,14 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
                         alarmMethod(item,notifyDay,createID());
                     }
                     if (item.daysLeftInt() >= 0 & targetItem == null) {
-                        alarmMethod(item, 0,createID());
+                        SharedPreferences sharedPref = getSharedPreferences("Settings",Context.MODE_PRIVATE);
+                        switch (sharedPref.getInt(DEFAULT_NOTIFY_SETTING,DEFAULT_NOTIFY_ON)){
+                            case DEFAULT_NOTIFY_ON:
+                                alarmMethod(item, 0,createID());
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     newIntent = new Intent();
                     setResult(RESULT_OK, newIntent);
@@ -306,6 +321,19 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
 
 
     private void alarmMethod(Item item, int notificationDay, int alertID) {
+        int dayOrNight;
+        SharedPreferences sharedPref = getSharedPreferences("Settings",Context.MODE_PRIVATE);
+        switch (sharedPref.getInt(DEFAULT_NOTIFY_TIME_SETTING,DEFAULT_NOTIFY_TIME_MORNING)){
+            case DEFAULT_NOTIFY_TIME_MORNING:
+                dayOrNight = Calendar.AM;
+                break;
+            case DEFAULT_NOTIFY_TIME_EVENING:
+                dayOrNight = Calendar.PM;
+                break;
+            default:
+                dayOrNight = Calendar.AM;
+                break;
+        }
         Intent alarmIntent = new Intent(this, NotifyHelper.class);
         alarmIntent.putExtra("daysLeft",notificationDay);
         alarmIntent.putExtra("itemName",item.getItemName());
@@ -316,7 +344,7 @@ public class ItemDetail extends AppCompatActivity implements View.OnClickListene
         expiryDate.set(Calendar.HOUR, 8);
         expiryDate.set(Calendar.MINUTE, 0);
         expiryDate.set(Calendar.SECOND, 0);
-        expiryDate.set(Calendar.AM_PM, Calendar.AM);
+        expiryDate.set(Calendar.AM_PM, dayOrNight);
         long alertTime = expiryDate.getTimeInMillis();
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, alertTime, pendingIntent);

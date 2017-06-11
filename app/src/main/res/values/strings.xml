@@ -8,6 +8,10 @@
         <item>5 Days Before</item>
         <item>10 Days Before</item>
     </string-array>
+    <string-array name="reminder_default_choice_array">
+        <item>Morning</item>
+        <item>Afternoon</item>
+    </string-array>
     <string-array name="colorTagHex">
         <item>#eceff1</item>
         <item>#8d6e63</item>

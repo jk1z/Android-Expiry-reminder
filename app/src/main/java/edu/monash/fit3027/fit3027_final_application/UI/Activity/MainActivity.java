@@ -80,10 +80,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent newIntent = new Intent(this, SettingPage.class);
+            startActivity(newIntent);
             return true;
         } else if (id == R.id.action_about) {
             Intent newIntent = new Intent(this, AboutPage.class);
             startActivity(newIntent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

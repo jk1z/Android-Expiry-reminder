@@ -39,6 +39,7 @@
         <activity android:name=".UI.Activity.ItemScanner" />
         <activity android:name=".UI.Activity.ColorSelectionGridView" />
         <activity android:name=".UI.Activity.AboutPage" />
+        <activity android:name=".UI.Activity.SettingPage"/>
 
         <receiver android:name=".Helper.NotifyHelper" />
         <activity
