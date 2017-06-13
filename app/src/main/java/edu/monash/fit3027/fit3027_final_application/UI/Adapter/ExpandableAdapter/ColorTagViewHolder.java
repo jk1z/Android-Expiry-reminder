@@ -21,7 +21,9 @@ import edu.monash.fit3027.fit3027_final_application.model.ColorTag;
 import static android.view.animation.Animation.RELATIVE_TO_SELF;
 
 /**
- * Created by Jack on 9/6/17.
+ * Created by YunHao Zhang
+ * Student ID: 26956047
+ * A view holder for colorTag
  */
 
 public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongClickListener, TextView.OnEditorActionListener{
@@ -33,6 +35,10 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
     private Context mContext;
     private DatabaseHelper DBHelper;
 
+    /**
+     * Construct a colorTagViewHolder
+     * @param itemView An item view
+     */
     public ColorTagViewHolder(View itemView) {
         super(itemView);
         mContext = itemView.getContext();
@@ -44,8 +50,13 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
 
     }
 
+    /**
+     * Bind the colorTag to item view
+     * @param colorTag
+     */
     public void onBind(ColorTag colorTag){
         categoryEditText.setText(colorTag.getDescription());
+        //Make the editText not editable
         categoryEditText.setOnLongClickListener(this);
         categoryEditText.setMaxLines(1);
 
@@ -58,6 +69,7 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
     }
 
     private void animateExpand() {
+        //Rotate the arrow icon 360
         RotateAnimation rotate =
                 new RotateAnimation(360, 180, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
         rotate.setDuration(300);
@@ -66,6 +78,7 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
     }
 
     private void animateCollapse() {
+        //Rotate the arrow icon 360
         RotateAnimation rotate =
                 new RotateAnimation(180, 360, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
         rotate.setDuration(300);
@@ -73,18 +86,27 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
         arrowImageView.startAnimation(rotate);
     }
 
+    /**
+     * Called when a view has been clicked and held.
+     *
+     * @param v The view that was clicked and held.
+     *
+     * @return true if the callback consumed the long click, false otherwise.
+     */
     @Override
     public boolean onLongClick(View v) {
         categoryEditText.setFocusable(true);
         categoryEditText.setEnabled(true);
         categoryEditText.setFocusableInTouchMode(true);
         categoryEditText.requestFocus();
+        //Make editText editable
         return true;
     }
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
+        //If user pressed enter, then save the content
         if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                 actionId == EditorInfo.IME_ACTION_DONE ||
                 actionId == EditorInfo.IME_ACTION_GO ||
@@ -101,6 +123,7 @@ public class ColorTagViewHolder extends ParentViewHolder implements View.OnLongC
             categoryEditText.setFocusable(false);
             categoryEditText.setClickable(true);
             categoryEditText.clearFocus();
+            //Make it uneditable
             DBHelper.updateColor(colorHex, categoryEditText.getText().toString());
             return true; // consume.
 

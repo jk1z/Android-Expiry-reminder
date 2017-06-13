@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         itemRecycleView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);// Giving it layout
         itemRecycleView.setLayoutManager(llm);
-        adapter = new ItemExpandableAdapter(DBHelper.createGroups(new ArrayList<Item>(DBHelper.getAllItem().values())), this);
+        adapter = new ItemExpandableAdapter(DBHelper.createGroups(DBHelper.getAllItem()), this);
 
 
         itemRecycleView.setAdapter(adapter);
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     protected void onResume() {
         super.onResume();
-        adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values()));
+        adapter.updateView(DBHelper.getAllItem());
     }
 
     @Override
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CONTENT_UPDATE) {
             if (resultCode == RESULT_OK) { //Update the view if database has been updated
-                adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values())); //TODO: Still try to find a efficient way to update a particular view
+                adapter.updateView(DBHelper.getAllItem()); //TODO: Still try to find a efficient way to update a particular view
             }
         }
     }

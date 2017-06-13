@@ -21,11 +21,17 @@ import edu.monash.fit3027.fit3027_final_application.UI.Activity.ItemDetail;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
 /**
- * Created by Jack on 9/6/17.
+ * Created by YunHao Zhang
+ * Student ID: 26956047
+ * A view holder for item
  */
 
 public class ItemViewHolder extends ChildViewHolder {
 
+    /**
+     * Construct a colorTagViewHolder
+     * @param itemView An item view
+     */
     public ItemViewHolder(View itemView) {
         super(itemView);
         itemCardView = (CardView) itemView.findViewById(R.id.itemCardView);
@@ -45,19 +51,24 @@ public class ItemViewHolder extends ChildViewHolder {
     private TextView itemTypeTextView;
     private Item item;
     private Context mContext;
-    private DatabaseHelper DBHelper;
 
     public Item getItem() {
         return item;
     }
 
+    /**
+     * Bind the item to item view
+     * @param item An item object
+     */
     public void onBind(Item item) {
         this.item = item;
         DateFormat displayDayOfWeek = new SimpleDateFormat("EEE", Locale.getDefault());
+        //Date format xx/xx
         expiryDateTextView.setText(item.getItemExpiryDate().get(Calendar.DATE) + "/" + item.getItemExpiryDate().get(Calendar.MONTH) + " " + displayDayOfWeek.format(item.getItemExpiryDate().get(Calendar.DAY_OF_WEEK)));
         itemQuantityTextView.setText(String.valueOf(item.getItemQuantity()));
         itemTypeTextView.setText(item.getItemType());
         int daysLeft = item.daysLeftInt();
+        //Colorful display of days left
         switch (daysLeft) {
             case 0:
             case 1:

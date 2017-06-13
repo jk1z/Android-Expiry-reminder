@@ -14,7 +14,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by Jack on 05-Jun-17.
+ * Created by YunHao Zhang
+ * Student ID: 26956047
+ * A customised network helper to get barcode in the background
  */
 
 public class GetItemByBarcode extends NetworkHelper {
@@ -28,19 +30,27 @@ public class GetItemByBarcode extends NetworkHelper {
 
     private boolean isFromServer = false;
 
+    /**
+     * Construct a getItemByBarcode Object
+     * @param mContext Application context
+     * @param editText EditText that is going to be filled
+     * @param barcode Barcode in string
+     */
     public GetItemByBarcode(Context mContext, EditText editText, String barcode) {
         this.mContext = mContext;
         this.editText = editText;
         this.barcode = barcode;
     }
 
+
     @Override
     protected String doInBackground(String... strings) {
+        //Get the barcode from server
         try {
             URL url = new URL(BARCODE_QUERY_SERVER_URL + "getItemByBarcode.py?" + "barcode=" + barcode + "&" + "apiKey=" + this.apiKey);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             InputStream input = connection.getInputStream();
-            String result = "";
+            String result;
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
             StringBuilder sb = new StringBuilder();
             while ((result = reader.readLine()) != null) {
@@ -53,16 +63,21 @@ public class GetItemByBarcode extends NetworkHelper {
         return null;
     }
 
+    /**
+     *
+     * Execute when doInBackground return a string
+     * @param result The result of the operation
+     */
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
             try {
                 JSONObject barcodeContents = new JSONObject(result);
                 String status = barcodeContents.getString("Status");
-                if (status.equals("0")) {
+                if (status.equals("0")) { //If status equal 0 means query syntax is right
                     String itemName = barcodeContents.getString("item_name");
-                    if (!itemName.equals("")) {
-                        this.editText.setText(barcodeContents.getString("item_name"));
+                    if (!itemName.equals("")) { //If return is not null, then the barcode is in database
+                        this.editText.setText(itemName);
                         this.isFromServer = true;
                     } else {
                         this.isFromServer = false;

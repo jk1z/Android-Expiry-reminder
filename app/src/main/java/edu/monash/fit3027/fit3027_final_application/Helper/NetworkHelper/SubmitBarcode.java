@@ -11,13 +11,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by Jack on 06-Jun-17.
+ * Created by YunHao Zhang
+ * Student ID: 26956047
+ * A customised network helper to submit barcode in the background
  */
 
 public class SubmitBarcode extends NetworkHelper {
     private String barcode;
     private String itemName;
 
+    /**
+     * Construct a SubmitBarcode Object
+     * @param barcode Barcode in string
+     * @param itemName Item name
+     */
     public SubmitBarcode(String barcode, String itemName) {
         this.barcode = barcode;
         this.itemName = itemName;
@@ -25,6 +32,7 @@ public class SubmitBarcode extends NetworkHelper {
 
     @Override
     protected String doInBackground(String... strings) {
+        //Submit the barcode
         try {
             URL url = new URL(BARCODE_QUERY_SERVER_URL + "submitBarcode.py?" + "barcode=" + barcode + "&" + "item_name=" + itemName + "&" + "apiKey=" + this.apiKey);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -44,6 +52,7 @@ public class SubmitBarcode extends NetworkHelper {
     }
 
     protected void onPostExecute(String result) {
+        //User shouldn't be worry about the result of submission
         if (result != null) {
             try {
                 JSONObject barcodeContents = new JSONObject(result);

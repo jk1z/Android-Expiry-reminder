@@ -12,16 +12,29 @@ import android.widget.ImageView;
 import edu.monash.fit3027.fit3027_final_application.R;
 
 /**
- * Created by Jack on 06-Jun-17.
+ * Created by YunHao Zhang
+ * Student ID: 26956047
+ * Adapter for gridView
  */
 
 public class ColorButtonAdapter extends BaseAdapter {
     private Context mContext;
     private String[] colorHexArray;
+
+    /**
+     * Construct a colorButtonAdapter object
+     * @param context Application context
+     * @param colorHexArray Array contains a series of colorhex
+     */
     public ColorButtonAdapter(Context context, String[] colorHexArray){
         this.mContext = context;
         this.colorHexArray = colorHexArray;
     }
+    /**
+     * How many items are in the data set represented by this Adapter.
+     *
+     * @return Count of items.
+     */
     @Override
     public int getCount() {
         return this.colorHexArray.length;
@@ -40,7 +53,7 @@ public class ColorButtonAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
-        if (convertView == null) {
+        if (convertView == null) { //Create ImageView programmatically
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(270, 270));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -49,7 +62,7 @@ public class ColorButtonAdapter extends BaseAdapter {
         {
             imageView = (ImageView) convertView;
         }
-        imageView.setBackgroundColor(Color.parseColor(colorHexArray[position]));
+        imageView.setBackgroundColor(Color.parseColor(colorHexArray[position])); //Set the background according to the position
         return imageView;
     }
 }
