@@ -1,5 +1,6 @@
 package edu.monash.fit3027.fit3027_final_application.UI.Activity;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,54 +13,62 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import edu.monash.fit3027.fit3027_final_application.Helper.DatabaseHelper;
 import edu.monash.fit3027.fit3027_final_application.R;
 import edu.monash.fit3027.fit3027_final_application.UI.Adapter.ExpandableAdapter.ItemExpandableAdapter;
-import edu.monash.fit3027.fit3027_final_application.model.ColorTag;
 import edu.monash.fit3027.fit3027_final_application.model.Item;
 
+/**
+ * Created by YunHao Zhang
+ * Student ID: 26956047
+ * Activity controller for activity_main
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private RecyclerView itemRecycleView;
     private FloatingActionButton addItemFab;
     private FloatingActionButton addThroughCameraFab;
-    private ArrayList<Item> itemArray;
+
     private DatabaseHelper DBHelper;
-    //private ItemAdapter adapter;
     private ItemExpandableAdapter adapter;
     public final static int REQUEST_CONTENT_UPDATE = 1;
 
+    /**
+     * When the activity has been created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DBHelper = new DatabaseHelper(getApplicationContext());
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // Grab all of the information from the interface
         addItemFab = (FloatingActionButton) findViewById(R.id.addItemFab);
         addThroughCameraFab = (FloatingActionButton) findViewById(R.id.addThroughCameraFab);
         itemRecycleView = (RecyclerView) findViewById(R.id.itemRecyclerView);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar); //Set up toolbar
 
-        setSupportActionBar(toolbar);
+        // Initialise database helper
+        DBHelper = new DatabaseHelper(getApplicationContext());
 
+        // Initialise recycler view
         itemRecycleView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
+        LinearLayoutManager llm = new LinearLayoutManager(this);// Giving it layout
         itemRecycleView.setLayoutManager(llm);
-        itemArray = new ArrayList<>(DBHelper.getAllItem().values());
-        adapter = new ItemExpandableAdapter(DBHelper.createGroups(itemArray),this);
+        adapter = new ItemExpandableAdapter(DBHelper.createGroups(new ArrayList<Item>(DBHelper.getAllItem().values())), this);
 
-        //adapter = new ItemAdapter(this, itemArray);
+
         itemRecycleView.setAdapter(adapter);
+        //Setting button connection to the floating button
         addItemFab.setOnClickListener(this);
         addThroughCameraFab.setOnClickListener(this);
     }
 
-    protected void onResume(){
+    /**
+     * When user come back from the notification, recycler view should update itself
+     */
+    protected void onResume() {
         super.onResume();
         adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values()));
     }
@@ -71,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    /**
+     * This initialise the option menu
+     * @return Display the options menu
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -92,16 +105,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
     @Override
     public void onClick(View v) {
         Intent newIntent;
         switch (v.getId()) {
-            case R.id.addItemFab:
+            case R.id.addItemFab: //When user clicked plus button
                 newIntent = new Intent(this, ItemDetail.class);
                 startActivityForResult(newIntent, REQUEST_CONTENT_UPDATE);
                 break;
-            case R.id.addThroughCameraFab:
+            case R.id.addThroughCameraFab://When user clicked camera button
                 newIntent = new Intent(this, ItemDetail.class);
                 newIntent.putExtra("addThroughCamera", true);
                 startActivityForResult(newIntent, REQUEST_CONTENT_UPDATE);
@@ -110,16 +127,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-
+    /**
+     * Handling the result from other view and update the list view accrodingly
+     * @param requestCode: What action it request to do
+     * @param resultCode: What result it send back
+     * @param data data inside of intent
+     */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CONTENT_UPDATE) {
-            if (resultCode == RESULT_OK) {
-                    adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values()));
+            if (resultCode == RESULT_OK) { //Update the view if database has been updated
+                adapter.updateView(new ArrayList<>(DBHelper.getAllItem().values())); //TODO: Still try to find a efficient way to update a particular view
             }
         }
     }
-
 
 
 }
